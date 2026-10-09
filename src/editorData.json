@@ -661,6 +661,10 @@
             "emoji": "🧑🏽",
             "color": "#ff3370",
             "dialogue": [
+              "Hi! Welcome to our school!",
+              "Do you know how many different jobs there are in a school?",
+              "Teachers are not the only people who work here!",
+              "Let's find out who works at this school.",
               "Help me identify the people who work at this school!"
             ],
             "editorCreated": false,
@@ -668,7 +672,11 @@
             "skin": "#F6C9A7",
             "hair": "#342B35",
             "hairStyle": "long",
-            "challenge": null
+            "challenge": {
+              "type": "editor",
+              "challengeId": "npc:cami_decision",
+              "starIndex": 1
+            }
           }
         },
         "objectOverrides": {
@@ -698,7 +706,139 @@
         ],
         "removedObjectIds": [],
         "removedChallengeIds": [],
-        "challengeOverrides": {},
+        "challengeOverrides": {
+          "myth:myth2": {
+            "id": "myth:myth2",
+            "title": "Cartel del aula 1B",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A doctor works in a hospital and helps sick people.",
+                "options": [
+                  "Myth",
+                  "Reality"
+                ],
+                "correctIndex": 1,
+                "explanation": "Doctors care for patients, diagnose problems, and suggest treatment plans.",
+                "multiSelect": false,
+                "correctIndexes": [
+                  1
+                ]
+              }
+            ]
+          },
+          "myth:myth1": {
+            "id": "myth:myth1",
+            "title": "Cartel del aula 1A",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A person who helps students learn in a classroom is a teacher.",
+                "options": [
+                  "Myth",
+                  "Reality"
+                ],
+                "correctIndex": 1,
+                "explanation": "Not quite!\nThink about where this person usually works and what their job is.\nTry again! 💪",
+                "multiSelect": false,
+                "correctIndexes": [
+                  1
+                ]
+              }
+            ]
+          },
+          "myth:myth3": {
+            "id": "myth:myth3",
+            "title": "Cartel del aula 1C",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A firefighter protects people during emergencies and works with fire safety.",
+                "options": [
+                  "Mith",
+                  "Reality"
+                ],
+                "correctIndex": 1,
+                "explanation": "Firefighters respond to emergencies, protect communities, and help during dangerous situations.",
+                "multiSelect": false,
+                "correctIndexes": [
+                  1
+                ]
+              }
+            ]
+          },
+          "myth:myth4": {
+            "id": "myth:myth4",
+            "title": "Cartel del aula 1D",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A farmer works in a hospital taking care of patients.",
+                "options": [
+                  "Myth",
+                  "Reality"
+                ],
+                "correctIndex": 0,
+                "explanation": "A farmer works outdoors with crops and animals, while doctors and nurses work in health settings.",
+                "multiSelect": false,
+                "correctIndexes": [
+                  0
+                ]
+              }
+            ]
+          },
+          "myth:myth5": {
+            "id": "myth:myth5",
+            "title": "Cartel del aula 2D",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A pilot flies airplanes and travels to different places.",
+                "options": [
+                  "Myth",
+                  "Reality"
+                ],
+                "correctIndex": 1,
+                "explanation": "Pilots operate aircraft and help people travel safely across cities or countries.",
+                "multiSelect": false,
+                "correctIndexes": [
+                  1
+                ]
+              }
+            ]
+          },
+          "npc:cami_decision": {
+            "id": "npc:cami_decision",
+            "title": "Desafío de Juana",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Help me identify the people who work at this school!",
+                "options": [
+                  "👩‍🏫 Teacher",
+                  "📚 Librarian",
+                  "👩‍⚕️ Nurse",
+                  "👨‍🔧 Mechanic",
+                  "🧹 Cleaner",
+                  "👩‍💻 IT Technician",
+                  "👨‍💼 Administrative",
+                  "👨‍🌾 Farmer",
+                  "✈️ Pilot"
+                ],
+                "correctIndex": 0,
+                "correctIndexes": [
+                  0,
+                  1,
+                  4,
+                  5,
+                  6
+                ],
+                "multiSelect": true,
+                "explanation": "❌ Not quite!\n\nThink about where this person usually works and what their job is.\n\nTry again! 💪"
+              }
+            ]
+          }
+        },
         "exit": {
           "x": 1420,
           "y": 360,
