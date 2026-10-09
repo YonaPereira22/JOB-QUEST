@@ -659,11 +659,16 @@
             "y": 264.6666564941406,
             "name": "Juana",
             "emoji": "🧑🏽",
-            "color": "#FF8FB1",
+            "color": "#ff3370",
             "dialogue": [
-              "Hello, How are you?"
+              "Help me identify the people who work at this school!"
             ],
-            "editorCreated": false
+            "editorCreated": false,
+            "gender": "female",
+            "skin": "#F6C9A7",
+            "hair": "#342B35",
+            "hairStyle": "long",
+            "challenge": null
           }
         },
         "objectOverrides": {
