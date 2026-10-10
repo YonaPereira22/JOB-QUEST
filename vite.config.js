@@ -114,11 +114,21 @@ function editorDataPlugin() {
               !Array.isArray(challenge.questions) || challenge.questions.length < 1 ||
               challenge.questions.length > 100 || challenge.questions.some((question) =>
                 !question || typeof question.text !== 'string' || !question.text.trim() ||
-                typeof question.explanation !== 'string' || !question.explanation.trim() ||
+                !(
+                  typeof question.correctExplanation === 'string' && question.correctExplanation.trim() ||
+                  typeof question.explanation === 'string' && question.explanation.trim()
+                ) ||
+                (question.retryExplanation !== undefined &&
+                  (typeof question.retryExplanation !== 'string' || !question.retryExplanation.trim())) ||
                 !Array.isArray(question.options) || question.options.length < 2 ||
                 question.options.length > 10 || question.options.some((option) => typeof option !== 'string' || !option.trim()) ||
                 !Number.isInteger(question.correctIndex) ||
-                question.correctIndex < 0 || question.correctIndex >= question.options.length
+                question.correctIndex < 0 || question.correctIndex >= question.options.length ||
+                (question.correctIndexes !== undefined &&
+                  (!Array.isArray(question.correctIndexes) || question.correctIndexes.length < 1 ||
+                    question.correctIndexes.some((index) =>
+                      !Number.isInteger(index) || index < 0 || index >= question.options.length
+                    ) || new Set(question.correctIndexes).size !== question.correctIndexes.length))
               )
             )) {
               response.statusCode = 400
@@ -143,7 +153,7 @@ function editorDataPlugin() {
 
 export default defineConfig({
   plugins: [react(), editorDataPlugin()],
-  base: '/juego_ITS_Anticonceptivos/',
+  base: '/',
   server: {
     watch: {
       usePolling: true,

@@ -1391,6 +1391,624 @@
           "label": "EXIT →"
         }
       }
+    },
+    "centro": {
+      "walls": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 1152,
+          "h": 24
+        },
+        {
+          "x": 0,
+          "y": 744,
+          "w": 1152,
+          "h": 24
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "w": 24,
+          "h": 768
+        },
+        {
+          "x": 1128,
+          "y": 0,
+          "w": 24,
+          "h": 768
+        },
+        {
+          "x": 13.333328247070312,
+          "y": 625.0000190734863,
+          "w": 471.3333740234375,
+          "h": 54.66668701171875
+        },
+        {
+          "x": 672.6667022705078,
+          "y": 635.0000190734863,
+          "w": 453.3333740234375,
+          "h": 41.33331298828125
+        },
+        {
+          "x": 304.6666717529297,
+          "y": 419.40333206177456,
+          "w": 38.666656494140625,
+          "h": 140
+        },
+        {
+          "x": 21.333328247070312,
+          "y": 402.73667556763394,
+          "w": 60,
+          "h": 132.66665649414062
+        },
+        {
+          "x": 179.3333282470703,
+          "y": 486.73670608521206,
+          "w": 66.66668701171875,
+          "h": 13.33331298828125
+        },
+        {
+          "x": 95.33332824707031,
+          "y": 532.7367060852121,
+          "w": 72,
+          "h": 14
+        },
+        {
+          "x": 249.3333282470703,
+          "y": 536.7367060852121,
+          "w": 55.333343505859375,
+          "h": 10.6666259765625
+        },
+        {
+          "x": 101.33332824707031,
+          "y": 558.0700190734933,
+          "w": 32,
+          "h": 9.33331298828125
+        },
+        {
+          "x": 468.00001525878906,
+          "y": 478.73668701172573,
+          "w": 34.66668701171875,
+          "h": 24
+        },
+        {
+          "x": 648.0000152587891,
+          "y": 483.40334350586636,
+          "w": 44.66668701171875,
+          "h": 13.333343505859375
+        },
+        {
+          "x": 100.66667175292969,
+          "y": 443.40334350586636,
+          "w": 196.66665649414062,
+          "h": 14.666656494140625
+        },
+        {
+          "x": 46.66667175292969,
+          "y": 270.3333435058594,
+          "w": 104.66665649414062,
+          "h": 54.666656494140625
+        },
+        {
+          "x": 303.3333282470703,
+          "y": 134.33333206176758,
+          "w": 44.66668701171875,
+          "h": 164
+        },
+        {
+          "x": 261.3333282470703,
+          "y": 300.3333320617676,
+          "w": 71.33334350585938,
+          "h": 25.333343505859375
+        },
+        {
+          "x": 381.3333282470703,
+          "y": 354.3333320617676,
+          "w": 64.66668701171875,
+          "h": 19.3333740234375
+        },
+        {
+          "x": 394.6667022705078,
+          "y": 337.0000190734863,
+          "w": 75.33331298828125,
+          "h": 15.33331298828125
+        },
+        {
+          "x": 95.33332824707031,
+          "y": 138.33333206176758,
+          "w": 216,
+          "h": 43.333343505859375
+        },
+        {
+          "x": 92.66667175292969,
+          "y": 183.66667556762695,
+          "w": 212,
+          "h": 20.666656494140625
+        },
+        {
+          "x": 79.33332824707031,
+          "y": 191.00001907348633,
+          "w": 14.66668701171875,
+          "h": 102.66665649414062
+        },
+        {
+          "x": 93.33332824707031,
+          "y": 199.00001907348633,
+          "w": 35.333343505859375,
+          "h": 75.33331298828125
+        },
+        {
+          "x": 276.6666717529297,
+          "y": 199.66667556762695,
+          "w": 30,
+          "h": 100.66665649414062
+        },
+        {
+          "x": 420.00001525878906,
+          "y": 77.00001907348633,
+          "w": 316.66668701171875,
+          "h": 146
+        },
+        {
+          "x": 510.6667022705078,
+          "y": 231.66667556762695,
+          "w": 131.33331298828125,
+          "h": 30
+        },
+        {
+          "x": 674.0000152587891,
+          "y": 235.66667556762695,
+          "w": 28.66668701171875,
+          "h": 12
+        },
+        {
+          "x": 826.0000152587891,
+          "y": 53.000003814697266,
+          "w": 116.66668701171875,
+          "h": 15.333328247070312
+        },
+        {
+          "x": 914.6667022705078,
+          "y": 24.333332061767578,
+          "w": 18.6666259765625,
+          "h": 24
+        },
+        {
+          "x": 802.6667022705078,
+          "y": 153.66667556762695,
+          "w": 17.33331298828125,
+          "h": 136
+        },
+        {
+          "x": 990.0000152587891,
+          "y": 289.0000190734863,
+          "w": 88,
+          "h": 8
+        },
+        {
+          "x": 1045.3333282470703,
+          "y": 163.66667556762695,
+          "w": 103.3333740234375,
+          "h": 115.33334350585938
+        },
+        {
+          "x": 822.6667022705078,
+          "y": 107.00001907348633,
+          "w": 314,
+          "h": 38.666656494140625
+        },
+        {
+          "x": 1054.000015258789,
+          "y": 148.33333206176758,
+          "w": 61.33331298828125,
+          "h": 15.333343505859375
+        },
+        {
+          "x": 818.0000152587891,
+          "y": 182.33333206176758,
+          "w": 234,
+          "h": 20
+        },
+        {
+          "x": 736.6667022705078,
+          "y": 362.7366870117083,
+          "w": 47.33331298828125,
+          "h": 14
+        },
+        {
+          "x": 798.0000152587891,
+          "y": 374.06999999998953,
+          "w": 16.66668701171875,
+          "h": 9.333343505859375
+        },
+        {
+          "x": 706.6667022705078,
+          "y": 378.06999999998953,
+          "w": 38.6666259765625,
+          "h": 12.66668701171875
+        },
+        {
+          "x": 820.0000152587891,
+          "y": 375.4033435058489,
+          "w": 292.00006103515625,
+          "h": 81.33334350585938
+        },
+        {
+          "x": 806.6667022705078,
+          "y": 393.4033435058489,
+          "w": 26,
+          "h": 140.66665649414057
+        },
+        {
+          "x": 831.3333282470703,
+          "y": 456.7366870117083,
+          "w": 38,
+          "h": 62.66665649414057
+        },
+        {
+          "x": 1108.0000762939453,
+          "y": 398.06999999998953,
+          "w": 24,
+          "h": 141.33334350585932
+        },
+        {
+          "x": 1013.3333282470703,
+          "y": 540.0699999999895,
+          "w": 96,
+          "h": 12.66668701171875
+        },
+        {
+          "x": 1001.3333282470703,
+          "y": 563.403374023427,
+          "w": 90.66668701171875,
+          "h": 32
+        },
+        {
+          "x": 686.6667022705078,
+          "y": 534.7366870117082,
+          "w": 36.6666259765625,
+          "h": 23.33331298828125
+        },
+        {
+          "x": 407.3333282470703,
+          "y": 563.403374023427,
+          "w": 40.66668701171875,
+          "h": 74.6666259765625
+        },
+        {
+          "x": 422.6666717529297,
+          "y": 546.0699999999895,
+          "w": 79.33334350585938,
+          "h": 26
+        },
+        {
+          "x": 868.0000152587891,
+          "y": 603.403374023427,
+          "w": 228,
+          "h": 28
+        },
+        {
+          "x": 778.6667022705078,
+          "y": 599.403374023427,
+          "w": 88,
+          "h": 30
+        },
+        {
+          "x": 19.333328247070312,
+          "y": 607.403353042592,
+          "w": 398,
+          "h": 14.66668701171875
+        },
+        {
+          "x": 352.00001525878906,
+          "y": 438.07000762938407,
+          "w": 40.66668701171875,
+          "h": 66.66665649414062
+        },
+        {
+          "x": 812.6667022705078,
+          "y": 350.8266641235212,
+          "w": 318,
+          "h": 20.66668701171875
+        },
+        {
+          "x": 737.3333282470703,
+          "y": 138.1600076293806,
+          "w": 78,
+          "h": 15.333343505859375
+        },
+        {
+          "x": 772.0000152587891,
+          "y": 155.49335113523998,
+          "w": 29.33331298828125,
+          "h": 84.66665649414062
+        },
+        {
+          "x": 354.00001525878906,
+          "y": 168.1600076293806,
+          "w": 37.33331298828125,
+          "h": 75.33334350585938
+        },
+        {
+          "x": 353.3333282470703,
+          "y": 138.82666412352123,
+          "w": 66.66668701171875,
+          "h": 35.333343505859375
+        },
+        {
+          "x": 572.0000152587891,
+          "y": 361.49335113523995,
+          "w": 21.33331298828125,
+          "h": 34
+        },
+        {
+          "x": 904.0000152587891,
+          "y": 493.00000762939453,
+          "w": 87.33331298828125,
+          "h": 16.666656494140625
+        },
+        {
+          "x": 1049.3333282470703,
+          "y": 490.3333511352539,
+          "w": 39.3333740234375,
+          "h": 10
+        },
+        {
+          "x": 714.6667022705078,
+          "y": 563.0000076293945,
+          "w": 54.6666259765625,
+          "h": 79.33334350585938
+        },
+        {
+          "x": 646.6667022705078,
+          "y": 545.0000076293945,
+          "w": 56.6666259765625,
+          "h": 45.333343505859375
+        },
+        {
+          "x": 778.0000152587891,
+          "y": 453.66666412353516,
+          "w": 32.66668701171875,
+          "h": 54.66668701171875
+        },
+        {
+          "x": 32.66667175292969,
+          "y": 386.83309264488696,
+          "w": 290,
+          "h": 20
+        },
+        {
+          "x": 543.9290231214812,
+          "y": 403.52753902831466,
+          "w": 56.66668701171875,
+          "h": 28.666656494140625
+        },
+        {
+          "x": 800.0000152587891,
+          "y": 276.58876612408807,
+          "w": 88,
+          "h": 20.666656494140625
+        }
+      ],
+      "content": {
+        "npcs": [
+          {
+            "id": "editor-npc-1791654115307",
+            "x": 554.6680170463118,
+            "y": 499.66667556762695,
+            "name": "Employment Advisor",
+            "emoji": "🧑‍💼",
+            "color": "#ff0a23",
+            "gender": "male",
+            "skin": "#F6C9A7",
+            "hair": "#342B35",
+            "hairStyle": "short",
+            "dialogue": [
+              "Welcome to the Career Preparation Center!",
+              "Before starting a job, you need to learn how to act responsibly.",
+              "Visit the different areas, talk to the workers and complete their challenges.",
+              "You will face real-life situations and decide what people should and shouldn't do.",
+              "Make good decisions, earn points and get ready for your future job.",
+              "Good luck!"
+            ],
+            "editorCreated": true
+          }
+        ],
+        "objects": [
+          {
+            "id": "editor-pista-1791655156247",
+            "x": 190.33336639404297,
+            "y": 294.35332061764785,
+            "type": "pista",
+            "label": "Professional Behavior",
+            "emoji": "📌",
+            "text": "Alex arrives late every day. His team has to wait for him before starting work.",
+            "editorCreated": true
+          },
+          {
+            "id": "editor-pista-1791655895556",
+            "x": 930.3333435058594,
+            "y": 276.12688038496054,
+            "type": "pista",
+            "label": "Safety Workshop",
+            "emoji": "📌",
+            "text": "A Damaged Tool",
+            "editorCreated": true
+          },
+          {
+            "id": "editor-pista-1791656235319",
+            "x": 191,
+            "y": 529.666675567627,
+            "type": "pista",
+            "label": "Teamwork Office",
+            "emoji": "📌",
+            "text": "Teamwork Office",
+            "editorCreated": true
+          },
+          {
+            "id": "editor-pista-1791656536257",
+            "x": 950.6667022705078,
+            "y": 550.3333435058594,
+            "type": "pista",
+            "label": "Skills Labs",
+            "emoji": "📌",
+            "text": "Skills Labs",
+            "editorCreated": true
+          }
+        ],
+        "npcOverrides": {},
+        "objectOverrides": {},
+        "removedNpcIds": [
+          "enfermera_rosa",
+          "doctor_lucas"
+        ],
+        "removedObjectIds": [
+          "its_vih",
+          "its_sifilis",
+          "its_gonorrea",
+          "its_vph",
+          "dragdrop_station"
+        ],
+        "removedChallengeIds": [],
+        "challengeOverrides": {
+          "object:editor-pista-1791655156247": {
+            "id": "object:editor-pista-1791655156247",
+            "title": "1",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Alex arrives late every day. His team has to wait for him before starting work.\nWhat should Alex do?",
+                "options": [
+                  "He should arrive on time",
+                  "He should ignore the schedule.",
+                  "He should ask everyone to wait."
+                ],
+                "correctIndex": 0,
+                "correctIndexes": [
+                  0
+                ],
+                "multiSelect": false,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              },
+              {
+                "text": "During a team meeting, a coworker makes a mistake while explaining an idea. Some people start laughing.\nWhat shouldn't the team do?",
+                "options": [
+                  "They shouldn't listen.",
+                  "They shouldn't laugh at the coworker.",
+                  "They shouldn't help each other."
+                ],
+                "correctIndex": 1,
+                "correctIndexes": [
+                  1
+                ],
+                "multiSelect": false,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              }
+            ]
+          },
+          "object:editor-pista-1791655895556": {
+            "id": "object:editor-pista-1791655895556",
+            "title": "Safety Workshop",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Sam is about to use a power tool. He notices that its electrical cable is damaged.\nQuestion: What shouldn't Sam do?",
+                "options": [
+                  "He shouldn't report the problem.",
+                  "He shouldn't ask the supervisor for help.",
+                  "He shouldn't use the tool with a damaged cable."
+                ],
+                "correctIndex": 2,
+                "correctIndexes": [
+                  2
+                ],
+                "multiSelect": false,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              },
+              {
+                "text": "Safety Rules\nJordan is working in a workshop. He sees a colleague using a machine without the required protective equipment.\nQuestion: What should Jordan do?",
+                "options": [
+                  "He should ignore the situation",
+                  "He should warn the colleague and follow safety procedures.",
+                  "He should remove the safety signs."
+                ],
+                "correctIndex": 1,
+                "correctIndexes": [
+                  1
+                ],
+                "multiSelect": false,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              }
+            ]
+          },
+          "object:editor-pista-1791656235319": {
+            "id": "object:editor-pista-1791656235319",
+            "title": "Teamwork Office",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Taylor is having trouble understanding an important task. The team must finish the job before the end of the day.\nChoose TWO responsible actions.",
+                "options": [
+                  "Explain the task to Taylor.",
+                  "Laugh at Taylor.",
+                  "Work together to solve the problem",
+                  "Leave without telling anyone"
+                ],
+                "correctIndex": 0,
+                "correctIndexes": [
+                  0,
+                  2
+                ],
+                "multiSelect": true,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              },
+              {
+                "text": "A Team Problem \nA team member finishes their work early while another coworker is struggling with a difficult task.\nQuestion: What should the team member do?",
+                "options": [
+                  "He should offer help if possible",
+                  "He should make fun of the coworker.",
+                  "He should hide the information needed to finish the task."
+                ],
+                "correctIndex": 0,
+                "correctIndexes": [
+                  0
+                ],
+                "multiSelect": false,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              }
+            ]
+          },
+          "object:editor-pista-1791656536257": {
+            "id": "object:editor-pista-1791656536257",
+            "title": "Skills Labs",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Meeting a Deadline \nMorgan has an important task to finish by Friday. On Wednesday, Morgan realizes that the work is taking longer than expected.\nQuestion: What should Morgan do?",
+                "options": [
+                  "Morgan should wait until Friday to mention the problem",
+                  "Morgan should inform the supervisor and organize the remaining work.",
+                  "Morgan should stop working without telling anyone."
+                ],
+                "correctIndex": 1,
+                "correctIndexes": [
+                  1
+                ],
+                "multiSelect": false,
+                "correctExplanation": "Excellent! That's the right decision! You're ready to take on the next challenge. Keep going!",
+                "retryExplanation": "Not quite! Think carefully about what a responsible worker should or shouldn't do. Try again!"
+              }
+            ]
+          }
+        }
+      }
     }
   }
 }

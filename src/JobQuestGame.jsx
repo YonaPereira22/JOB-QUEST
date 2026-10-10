@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import projectEditorData from "./editorData.json";
+import InterviewBattle from "./InterviewBattle.jsx";
 
 const publicAsset = (path) => `${import.meta.env.BASE_URL}${path}`;
 
@@ -988,10 +989,10 @@ const INTERACT_RADIUS = 60;
 function areLevelObjectivesComplete(levelConfig, runtime) {
   const required = levelConfig.objectivesRequired;
   return levelConfig.customObjectives
-    ? required.every((key) => runtime.doneObjects[key])
+    ? required.every((key) => runtime.doneObjects[key] || runtime.doneNpcs[key])
     : levelConfig.objectivesAreNpcs
     ? required.every((id) => runtime.doneNpcs[id])
-    : required.every((id) => runtime.doneObjects[id]);
+    : required.every((id) => runtime.doneObjects[id] || runtime.doneNpcs[id]);
 }
 
 const EMPTY_EDITOR_CONTENT = {
@@ -1155,7 +1156,7 @@ const UI_TEXT = {
     locked: "Bloqueado",
     testMode: "MODO PRUEBA",
     testModeText: "Acceso rápido para probar cualquier mapa sin completar los anteriores.",
-    quickTooltip: "Nivel 3 se desbloquea al reunir al menos 4 estrellas entre Career Clues y Workplace Signals. Nivel 4 se desbloquea al completar los tres niveles anteriores.",
+    quickTooltip: "Cada mapa se desbloquea al completar todos sus desafíos y objetivos. Las respuestas incorrectas descuentan estrellas del resultado.",
     labelCareerClues: "Career Clues",
     labelSignals: "Workplace Signals",
     labelCareerCenter: "Career Center",
@@ -1173,7 +1174,7 @@ const UI_TEXT = {
     locked: "Locked",
     testMode: "TEST MODE",
     testModeText: "Quick access to test any map without completing the previous ones.",
-    quickTooltip: "Level 3 unlocks after gathering at least 4 stars between Career Clues and Workplace Signals. Level 4 unlocks after completing the previous three levels.",
+    quickTooltip: "Each map unlocks after completing all of its challenges and objectives. Incorrect answers reduce the stars earned.",
     labelCareerClues: "Career Clues",
     labelSignals: "Workplace Signals",
     labelCareerCenter: "Career Center",
@@ -1348,328 +1349,6 @@ function MapScreen({ progress, onEnterLevel, character, language = "es" }) {
       <p style={{ marginTop: 28, color: "#8891C4", fontFamily: "'Inter', sans-serif", fontSize: 13, maxWidth: 480, textAlign: "center" }}>
         {text.quickTooltip}
       </p>
-    </div>
-  );
-}
-
-function FinalMissionScreen({ character, onComplete }) {
-  const arenaRef = useRef(null);
-  const keysRef = useRef(new Set());
-  const audioRef = useRef(null);
-  const stateRef = useRef({
-    player: { x: 105, y: 250, direction: "right", action: "idle", actionUntil: 0, frame: 0 },
-    targets: [],
-    projectiles: [],
-    lastSpawn: 0,
-    spawned: 0,
-  });
-  const [started, setStarted] = useState(false);
-  const [level, setLevel] = useState(1);
-  const [wave, setWave] = useState(1);
-  const [targets, setTargets] = useState([]);
-  const [projectiles, setProjectiles] = useState([]);
-  const [player, setPlayer] = useState({ x: 105, y: 250 });
-  const [bossHealth, setBossHealth] = useState(100);
-  const [populationHealth, setPopulationHealth] = useState(100);
-  const [score, setScore] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [message, setMessage] = useState("");
-  const [result, setResult] = useState(null);
-  const [certificateError, setCertificateError] = useState("");
-
-  useEffect(() => {
-    const down = (event) => keysRef.current.add(event.key.toLowerCase());
-    const up = (event) => keysRef.current.delete(event.key.toLowerCase());
-    window.addEventListener("keydown", down);
-    window.addEventListener("keyup", up);
-    return () => {
-      window.removeEventListener("keydown", down);
-      window.removeEventListener("keyup", up);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!started || result) return undefined;
-    audioRef.current?.play().catch(() => {});
-    let raf;
-    let last = performance.now();
-    const loop = (time) => {
-      const dt = Math.min((time - last) / 1000, 0.04);
-      last = time;
-      const state = stateRef.current;
-      const keys = keysRef.current;
-      const speed = 260 * dt;
-      const moving = keys.has("w") || keys.has("arrowup") || keys.has("s") || keys.has("arrowdown")
-        || keys.has("a") || keys.has("arrowleft") || keys.has("d") || keys.has("arrowright");
-      if (keys.has("w") || keys.has("arrowup")) {
-        state.player.y -= speed;
-        state.player.direction = "up";
-      }
-      if (keys.has("s") || keys.has("arrowdown")) {
-        state.player.y += speed;
-        state.player.direction = "down";
-      }
-      if (keys.has("a") || keys.has("arrowleft")) {
-        state.player.x -= speed;
-        state.player.direction = "left";
-      }
-      if (keys.has("d") || keys.has("arrowright")) {
-        state.player.x += speed;
-        state.player.direction = "right";
-      }
-      if (moving && time > state.player.actionUntil) state.player.action = "walk";
-      if (!moving && time > state.player.actionUntil) state.player.action = "idle";
-      state.player.frame = Math.floor(time / 120) % 12;
-      state.player.x = Math.max(40, Math.min(860, state.player.x));
-      state.player.y = Math.max(35, Math.min(465, state.player.y));
-      state.lastSpawn += dt;
-      const spawnRate = Math.max(0.35, 1.05 - level * 0.12 - wave * 0.08);
-      const waveTotal = 8 + level * 2 + wave;
-      if (state.lastSpawn > spawnRate && state.targets.length < 10 && state.spawned < waveTotal) {
-        state.lastSpawn = 0;
-        state.spawned += 1;
-        const bacteria = Math.random() < 0.48;
-        const diseases = bacteria ? ["Gonorrea", "Sífilis", "Clamidia"] : ["VIH", "VPH", "Hepatitis B", "Herpes"];
-        let spawnY = 60 + Math.random() * 380;
-        for (let attempt = 0; attempt < 8; attempt += 1) {
-          if (state.targets.every((target) => Math.abs(target.y - spawnY) >= 78)) break;
-          spawnY = 60 + Math.random() * 380;
-        }
-        state.targets.push({
-          id: `${time}-${Math.random()}`,
-          x: 875,
-          y: spawnY,
-          disease: diseases[Math.floor(Math.random() * diseases.length)],
-          bacteria,
-          kind: bacteria ? "bacteria" : "virus",
-          speed: 45 + level * 12 + wave * 8,
-        });
-      }
-      state.targets.forEach((target) => { target.x -= target.speed * dt; });
-      const nextProjectiles = [];
-      state.projectiles.forEach((shot) => {
-        shot.x += shot.vx * dt;
-        shot.y += shot.vy * dt;
-        const hit = state.targets.find((target) => Math.hypot(target.x - shot.x, target.y - shot.y) < 38);
-        if (hit) {
-          hit.hit = true;
-          if (hit.bacteria) {
-            setBossHealth((value) => {
-              const next = Math.max(0, value - 10);
-              if (next === 0) setResult("victory");
-              return next;
-            });
-            setScore((value) => value + 100);
-            setCombo((value) => value + 1);
-            setMessage(`Impacto efectivo: bacteria eliminada`);
-          } else {
-            setPopulationHealth((value) => {
-              const next = Math.max(0, value - 20);
-              if (next === 0) setResult("defeat");
-              return next;
-            });
-            setCombo(0);
-            setMessage(`¡Objetivo equivocado! Era ${hit.disease}: un virus`);
-          }
-        } else if (shot.x < 920 && shot.y > -30 && shot.y < 530) nextProjectiles.push(shot);
-      });
-      state.projectiles = nextProjectiles;
-      state.targets = state.targets.filter((target) => {
-        if (target.hit) return false;
-        if (target.x < 45) {
-          if (target.bacteria) {
-            setPopulationHealth((value) => {
-              const next = Math.max(0, value - 12);
-              if (next === 0) setResult("defeat");
-              return next;
-            });
-            setCombo(0);
-            setMessage(`¡La bacteria ${target.disease} alcanzó la zona protegida!`);
-          }
-          return false;
-        }
-        return true;
-      });
-      if (state.spawned >= waveTotal && state.targets.length === 0 && state.projectiles.length === 0) {
-        state.spawned = 0;
-        if (wave < 3) {
-          setWave((value) => value + 1);
-          setMessage("Oleada superada. Preparando la siguiente...");
-        } else if (level < 3) {
-          setLevel((value) => value + 1);
-          setWave(1);
-          setMessage("Nivel superado. La amenaza se acelera...");
-        } else if (bossHealth > 0) {
-          setResult("defeat");
-        }
-      }
-      setPlayer({ ...state.player });
-      setTargets(state.targets.map((target) => ({ ...target })));
-      setProjectiles(state.projectiles.map((shot) => ({ ...shot })));
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [started, result, level, wave]);
-
-  function startMission() {
-    stateRef.current = {
-      player: { x: 105, y: 250, direction: "right", action: "idle", actionUntil: 0, frame: 0 },
-      targets: [],
-      projectiles: [],
-      lastSpawn: 0,
-      spawned: 0,
-    };
-    setStarted(true);
-  }
-
-  function shoot(event) {
-    if (!started || result || !arenaRef.current) return;
-    const rect = arenaRef.current.getBoundingClientRect();
-    const sx = player.x;
-    const sy = player.y;
-    const tx = ((event.clientX - rect.left) / rect.width) * 900;
-    const ty = ((event.clientY - rect.top) / rect.height) * 500;
-    const distanceToTarget = Math.hypot(tx - sx, ty - sy) || 1;
-    stateRef.current.player.action = "shoot";
-    stateRef.current.player.actionUntil = performance.now() + 220;
-    stateRef.current.projectiles.push({ x: sx, y: sy, vx: ((tx - sx) / distanceToTarget) * 760, vy: ((ty - sy) / distanceToTarget) * 760 });
-  }
-
-  function downloadCertificate() {
-    setCertificateError("");
-    const image = new Image();
-    image.src = publicAsset("final-mission/certificate-template.png");
-    image.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
-      const context = canvas.getContext("2d");
-      if (!context) {
-        setCertificateError("No se pudo preparar el certificado para descargar.");
-        return;
-      }
-      context.drawImage(image, 0, 0);
-      context.fillStyle = "#123B73";
-      context.font = "700 42px Inter, Arial, sans-serif";
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      context.fillText(character.name, canvas.width / 2, 320);
-      const link = document.createElement("a");
-      link.download = `certificado-mision-cuidado-${character.name.trim().replace(/\s+/g, "-").toLowerCase()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    };
-    image.onerror = () => setCertificateError("No se pudo cargar la plantilla del certificado.");
-  }
-
-  if (result) {
-    const victory = result === "victory";
-    return (
-      <div style={styles.finalMission} className="final-mission">
-        <div style={styles.finalMissionOverlay}>
-          <h1 style={{ ...styles.title, color: victory ? "#7CE0C6" : "#FF8FB1" }}>
-            {victory ? "¡MISIÓN COMPLETADA!" : "MISIÓN FALLIDA"}
-          </h1>
-          <p>{victory ? "Lograste superar los niveles y usar el antibiótico contra las bacterias." : "Una bacteria alcanzó la población antes de que pudieras eliminarla."}</p>
-          {victory && (
-            <div style={styles.certificateBox}>
-              <div style={styles.certificatePreview}>
-                <img src={publicAsset("final-mission/certificate-template.png")} alt="Certificado de logro" style={styles.certificatePreviewImage} />
-                <span style={styles.certificateName}>{character.name}</span>
-              </div>
-              <BigButton onClick={downloadCertificate} color="#1BA7E1">
-                Descargar certificado
-              </BigButton>
-              {certificateError && <p style={styles.certificateError}>{certificateError}</p>}
-            </div>
-          )}
-          <BigButton onClick={() => onComplete(victory ? 3 : 0)} color={victory ? "#C6F135" : "#FF8FB1"}>Volver al mapa</BigButton>
-        </div>
-      </div>
-    );
-  }
-
-  if (!started) {
-    return (
-      <div style={styles.finalMission} className="final-mission">
-        <div style={styles.finalMissionOverlay}>
-          <h1 style={styles.title}>MISIÓN FINAL</h1>
-          <p>La amenaza está formada por bacterias y virus.</p>
-          <div style={styles.finalMissionIntro}>
-            <div style={styles.finalMissionIntroDoctor}>
-              <img
-                src={publicAsset("final-mission/doctor.png")}
-                alt="Doctor preparado para combatir las ITS"
-                style={styles.finalMissionIntroDoctorImage}
-              />
-            </div>
-            <p>{character.name}, mové al doctor con WASD o flechas y dispará con el mouse.</p>
-          </div>
-          <p style={{ color: "#C6F135", maxWidth: 560 }}>
-            El antibiótico cura Gonorrea, Sífilis y Clamidia. Si disparás a VIH, VPH, Hepatitis B o Herpes,
-            perdés protección porque son virus. Si un virus pasa de largo, no daña a la población.
-          </p>
-          <BigButton onClick={startMission}>Comenzar misión</BigButton>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={styles.finalMission} className="final-mission">
-      <div style={styles.finalMissionHeader}>
-        <strong>MISIÓN FINAL · ATAQUE ANTIBIÓTICO</strong>
-        <span>NIVEL {level}/3 · OLEADA {wave}/3 · COMBO x{combo}</span>
-      </div>
-      <div style={styles.finalMissionLayout}>
-        <div style={styles.finalMissionVisuals}>
-          <img src={publicAsset("final-mission/doctor.png")} alt="Dr. Vega" style={{ ...styles.finalMissionDoctor, filter: "drop-shadow(0 8px 8px rgba(0,0,0,.4))" }} />
-          <img src={publicAsset("final-mission/city.png")} alt="Población" style={styles.finalMissionCity} />
-        </div>
-        <div style={styles.finalMissionCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-            <strong style={{ color: "#FF4D8D" }}>BOSS {Math.max(0, Math.round(bossHealth))}/100</strong>
-            <strong style={{ color: "#7CE0C6" }}>POBLACIÓN {populationHealth}/100</strong>
-          </div>
-          <div style={styles.finalMissionBar}><span style={{ width: `${bossHealth}%`, background: "#FF4D8D" }} /></div>
-          <div style={styles.finalMissionBar}><span style={{ width: `${populationHealth}%`, background: "#7CE0C6" }} /></div>
-          <p style={{ color: "#8DB4FF", marginBottom: 4 }}>WASD / flechas: mover · Mouse: apuntar y disparar</p>
-          <p style={{ marginTop: 0, color: "#C9CFEA", fontSize: 13 }}>
-            Leé el nombre de cada objetivo y elegí con cuidado: todos se muestran de la misma forma.
-          </p>
-          <div ref={arenaRef} style={styles.finalMissionArena} onClick={shoot}>
-            <div
-              style={{
-                ...styles.finalMissionPlayer,
-                left: `${(player.x / 900) * 100}%`,
-                top: `${(player.y / 500) * 100}%`,
-                backgroundImage: `url('${publicAsset(`final-mission/${player.action === "shoot" ? "doctor-shoot" : "doctor-idle-walk"}.png`)}')`,
-                backgroundPosition: `-${((player.action === "walk" ? 3 : 0) + (player.frame % 3)) * 108.6}px 0`,
-                transform: `translate(-50%, -50%)${player.direction === "left" ? " scaleX(-1)" : ""}`,
-              }}
-            />
-            {projectiles.map((shot) => <div key={`${shot.x}-${shot.y}`} style={{ ...styles.finalMissionProjectile, left: `${(shot.x / 900) * 100}%`, top: `${(shot.y / 500) * 100}%` }}>💊</div>)}
-            {targets.map((target) => (
-              <div
-                key={target.id}
-                style={{
-                  ...styles.finalMissionTarget,
-                  left: `${(target.x / 900) * 100}%`,
-                  top: `${(target.y / 500) * 100}%`,
-                }}
-              >
-                {target.disease}
-              </div>
-            ))}
-          </div>
-          <div style={{ minHeight: 25, marginTop: 8, color: message.includes("equivocado") || message.includes("alcanzó") ? "#FF8FB1" : "#C6F135", fontSize: 13 }}>{message}</div>
-        </div>
-        <div style={styles.finalMissionBossPanel}>
-          <img src={publicAsset("final-mission/boss.png")} alt="Amenaza final" style={styles.finalMissionBoss} />
-        </div>
-      </div>
-      <audio ref={audioRef} src={publicAsset("final-mission/TensionLoop.wav")} loop preload="auto" />
     </div>
   );
 }
@@ -1889,12 +1568,13 @@ function InfoCardModal({ data, onClose }) {
 }
 
 /* ---------- Modal quiz múltiple (varias preguntas seguidas) ---------- */
-function MultiQuizModal({ questions, onFinish }) {
+function MultiQuizModal({ questions, onFinish, onIncorrectAnswer }) {
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const q = questions[idx];
   const answer = (i) => {
     const correct = i === q.correctIndex;
+    if (!correct) onIncorrectAnswer();
     setFeedback({ correct, explanation: q.explanation });
   };
   const next = () => {
@@ -1913,7 +1593,7 @@ function MultiQuizModal({ questions, onFinish }) {
   );
 }
 
-function EditableChallengeModal({ questions, title, presentation = "multiple", onFinish }) {
+function EditableChallengeModal({ questions, title, presentation = "multiple", onFinish, onIncorrectAnswer }) {
   const [index, setIndex] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
@@ -1938,17 +1618,25 @@ function EditableChallengeModal({ questions, title, presentation = "multiple", o
         : [...selected, optionIndex]);
       return;
     }
+    const correct = correctAnswers.includes(optionIndex);
+    if (!correct) onIncorrectAnswer();
     setFeedback({
-      correct: correctAnswers.includes(optionIndex),
-      explanation: question.explanation,
+      correct,
+      explanation: correct
+        ? question.correctExplanation || question.explanation
+        : question.retryExplanation || "No es la respuesta correcta. ¡Volvé a intentarlo!",
     });
   };
   const checkSelectedAnswers = () => {
     const selected = [...selectedAnswers].sort((a, b) => a - b);
     const correct = [...correctAnswers].sort((a, b) => a - b);
+    const isCorrect = selected.length === correct.length && selected.every((answer, answerIndex) => answer === correct[answerIndex]);
+    if (!isCorrect) onIncorrectAnswer();
     setFeedback({
-      correct: selected.length === correct.length && selected.every((answer, answerIndex) => answer === correct[answerIndex]),
-      explanation: question.explanation,
+      correct: isCorrect,
+      explanation: isCorrect
+        ? question.correctExplanation || question.explanation
+        : question.retryExplanation || "No es la respuesta correcta. ¡Volvé a intentarlo!",
     });
   };
 
@@ -2019,12 +1707,13 @@ function EditableChallengeModal({ questions, title, presentation = "multiple", o
 }
 
 /* ---------- Modal de escenarios de decisión (uno o varios) ---------- */
-function ScenarioModal({ scenarios, onFinish }) {
+function ScenarioModal({ scenarios, onFinish, onIncorrectAnswer }) {
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const s = scenarios[idx];
   const answer = (i) => {
     const correct = i === s.correctIndex;
+    if (!correct) onIncorrectAnswer();
     setFeedback({ correct, explanation: s.explanation });
   };
   const next = () => {
@@ -2064,7 +1753,7 @@ function ScenarioModal({ scenarios, onFinish }) {
 }
 
 /* ---------- Modal Drag & Drop (clasificación de métodos) ---------- */
-function DragDropModal({ onFinish }) {
+function DragDropModal({ onFinish, onIncorrectAnswer }) {
   const [placed, setPlaced] = useState({}); // methodId -> categoryId
   const [checked, setChecked] = useState(false);
   const [dragId, setDragId] = useState(null);
@@ -2157,7 +1846,10 @@ function DragDropModal({ onFinish }) {
           {!allCorrect && (
             <BigButton
               color="#8DB4FF"
-              onClick={() => setChecked(true)}
+              onClick={() => {
+                if (correctCount !== CONTRACEPTIVE_METHODS.length) onIncorrectAnswer();
+                setChecked(true);
+              }}
               style={{ opacity: allPlaced ? 1 : 0.5, pointerEvents: allPlaced ? "auto" : "none" }}
             >
               Verificar
@@ -2182,11 +1874,14 @@ function DragDropModal({ onFinish }) {
 }
 
 /* ---------- Modal de fragmento (misión final) ---------- */
-function FragmentModal({ mission, onFinish }) {
+function FragmentModal({ mission, onFinish, onIncorrectAnswer }) {
   const c = mission.challenge;
   const [feedback, setFeedback] = useState(null);
 
-  const finishWithResult = (correct, explanation) => setFeedback({ correct, explanation });
+  const finishWithResult = (correct, explanation) => {
+    if (!correct) onIncorrectAnswer();
+    setFeedback({ correct, explanation });
+  };
 
   if (c.type === "mito") {
     return (
@@ -2308,6 +2003,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     doneObjects: {}, // id -> true
     doneNpcs: {}, // id -> true
     stars: { 1: false, 2: false, 3: false },
+    incorrectAnswers: 0,
   });
   const pausedRef = useRef(false);
   const modalOpenRef = useRef(false);
@@ -2389,19 +2085,37 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       .map((object) => ({ ...object, ...(editorContent.objectOverrides[object.id] || {}) }));
     const editableNpcs = editorContent.npcs;
     const editableObjects = editorContent.objects;
+    const allNpcs = [...visibleNpcs, ...editableNpcs];
+    const allObjects = [...visibleObjects, ...editableObjects];
+    const challengeNpcObjectives = allNpcs
+      .filter((npc) => npc.challenge)
+      .map((npc) => npc.id);
+    const challengeObjectObjectives = allObjects
+      .filter((object) => {
+        const key = object.type === "mito"
+          ? `myth:${object.dataId}`
+          : object.type === "fragment"
+            ? `mission:${object.missionId}`
+            : `object:${object.id}`;
+        return editorContent.challengeOverrides[key]?.questions?.length &&
+          !editorContent.removedChallengeIds.includes(key);
+      })
+      .map((object) => object.id);
     return {
       ...levelConfig,
-      npcs: [...visibleNpcs, ...editableNpcs],
-      objects: [...visibleObjects, ...editableObjects],
+      npcs: allNpcs,
+      objects: allObjects,
       exit: editorContent.exit || levelConfig.exit,
       customObjectives: true,
-      objectivesRequired: [
+      objectivesRequired: [...new Set([
         ...(levelConfig.objectivesRequired || []).filter((id) =>
           !editorContent.removedObjectIds.includes(id) && !editorContent.removedNpcIds.includes(id)
         ),
         ...editableNpcs.map((npc) => npc.id),
         ...editableObjects.map((object) => object.id),
-      ],
+        ...challengeNpcObjectives,
+        ...challengeObjectObjectives,
+      ])],
     };
   }, [levelConfig, editorContent]);
 
@@ -2489,9 +2203,23 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     }
   }
 
+  function registerIncorrectAnswer() {
+    const mistakes = runtimeRef.current.incorrectAnswers + 1;
+    runtimeRef.current.incorrectAnswers = mistakes;
+    forceTick((tick) => tick + 1);
+    if (mistakes === 1) {
+      showToast("Una respuesta incorrecta: se descontará 1 estrella del resultado.");
+    } else if (mistakes === 6) {
+      showToast("Seis respuestas incorrectas: se descontarán 2 estrellas del resultado.");
+    }
+  }
+
   function currentStarCount() {
     const s = runtimeRef.current.stars;
-    return (s[1] ? 1 : 0) + (s[2] ? 1 : 0) + (s[3] ? 1 : 0);
+    const earned = (s[1] ? 1 : 0) + (s[2] ? 1 : 0) + (s[3] ? 1 : 0);
+    const mistakes = runtimeRef.current.incorrectAnswers;
+    const penalty = mistakes === 0 ? 0 : mistakes <= 5 ? 1 : 2;
+    return Math.max(0, earned - penalty);
   }
 
   function checkExit() {
@@ -2876,7 +2604,9 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       ? `npc:${item.id}`
       : item.type === "mito"
         ? `myth:${item.dataId}`
-        : `mission:${item.missionId}`;
+        : item.type === "fragment"
+          ? `mission:${item.missionId}`
+          : `object:${item.id}`;
     const saved = editorContent.challengeOverrides[challengeKey];
     const questions = saved?.questions ||
       (kind === "npc" ? challengeQuestionsForNpc(item) : challengeQuestionsForObject(item));
@@ -2891,12 +2621,22 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         ? questions.map((question) => ({
           ...question,
           options: [...question.options],
+          correctExplanation: question.correctExplanation || question.explanation || "",
+          retryExplanation: question.retryExplanation || "No es la respuesta correcta. ¡Volvé a intentarlo!",
           multiSelect: question.multiSelect || (question.correctIndexes?.length || 0) > 1,
           correctIndexes: question.correctIndexes?.length
             ? [...question.correctIndexes]
             : [question.correctIndex || 0],
         }))
-        : [{ text: "", options: ["", ""], correctIndex: 0, correctIndexes: [0], multiSelect: false, explanation: "" }],
+        : [{
+            text: "",
+            options: ["", ""],
+            correctIndex: 0,
+            correctIndexes: [0],
+            multiSelect: false,
+            correctExplanation: "",
+            retryExplanation: "",
+          }],
     });
   }
 
@@ -2916,20 +2656,21 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       ...question,
       text: question.text.trim(),
       options: question.options.map((option) => option.trim()),
-      explanation: question.explanation.trim(),
+      correctExplanation: (question.correctExplanation || question.explanation || "").trim(),
+      retryExplanation: question.retryExplanation.trim(),
       correctIndexes: question.multiSelect
         ? (question.correctIndexes?.length ? question.correctIndexes : [question.correctIndex])
         : [question.correctIndex],
     }));
     if (!challengeDraft.title.trim() || questions.length > 100 || questions.some((question) =>
-      !question.text || !question.explanation || question.options.length < 2 ||
+      !question.text || !question.correctExplanation || !question.retryExplanation || question.options.length < 2 ||
       question.options.length > 10 || question.options.some((option) => !option) ||
       !question.correctIndexes.length ||
       question.correctIndexes.some((answer) => !Number.isInteger(answer) || answer < 0 || answer >= question.options.length) ||
       new Set(question.correctIndexes).size !== question.correctIndexes.length ||
       (!question.multiSelect && question.correctIndexes.length !== 1)
     )) {
-      setEntityEditorError("Completá cada consigna, sus opciones, una respuesta correcta y la explicación.");
+      setEntityEditorError("Completá cada consigna, sus opciones, una respuesta correcta y los dos mensajes de devolución.");
       return;
     }
     if (challengeDraft.kind === "npc" && !challengeDraft.assignedNpcId) {
@@ -2947,6 +2688,9 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       const sourceNpc = challengeDraft.kind === "npc"
         ? editableLevelConfig.npcs.find((entry) => entry.id === challengeDraft.entityId)
         : null;
+      if (challengeDraft.kind !== "npc" && challengeDraft.challengeKey !== key) {
+        delete nextOverrides[challengeDraft.challengeKey];
+      }
       if (sourceNpc && sourceNpc.id !== npc.id) {
         delete nextOverrides[`npc:${sourceNpc.id}`];
       }
@@ -3118,6 +2862,18 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         break;
       }
       case "pista": {
+        const challengeKey = `object:${obj.id}`;
+        const challenge = editorContent.challengeOverrides[challengeKey];
+        if (challenge?.questions?.length) {
+          setModal({
+            kind: "editable_challenge",
+            obj,
+            title: challenge.title,
+            presentation: challenge.presentation || "multiple",
+            questions: challenge.questions,
+          });
+          break;
+        }
         runtimeRef.current.doneObjects[obj.id] = true;
         collectInventoryItem({ emoji: obj.emoji, label: obj.label, text: obj.text });
         playSound("pickup");
@@ -3219,6 +2975,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
   }
 
   function resolveMitoOrTF(correct) {
+    if (!correct) registerIncorrectAnswer();
     setModal((m) => ({ ...m, feedback: { correct, explanation: m.data.explanation } }));
     playSound(correct ? "correct" : "incorrect");
   }
@@ -3483,14 +3240,18 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                       : "Escribí las opciones y marcá con el círculo la respuesta correcta."}
                   </p>
                   <label>
-                    {challengeDraft.kind === "npc" ? "Asignar desafío a NPC" : "NPC (opcional)"}
+                    {challengeDraft.kind === "npc" ? "Asignar desafío a NPC" : "Asignar este desafío a un NPC (opcional)"}
                     <select
                       value={challengeDraft.assignedNpcId}
                       onChange={(event) => setChallengeDraft({ ...challengeDraft, assignedNpcId: event.target.value })}
                       style={editorInputStyle}
                     >
                       {challengeDraft.kind !== "npc" && (
-                        <option value="">Dejar el desafío en el cartel / fragmento</option>
+                        <option value="">
+                          {challengeDraft.entityId && editableLevelConfig.objects.find((item) => item.id === challengeDraft.entityId)?.type === "pista"
+                            ? "Dejar el desafío en la pista"
+                            : "Dejar el desafío en el cartel / fragmento"}
+                        </option>
                       )}
                       {editableLevelConfig.npcs.map((npc) => (
                         <option key={npc.id} value={npc.id}>{npc.name}</option>
@@ -3607,16 +3368,32 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                       >
                         {challengeDraft.presentation === "cards" ? "Agregar tarjeta" : "Agregar opción"}
                       </button>}
-                      <textarea
-                        aria-label={`Explicación ${questionIndex + 1}`}
-                        value={question.explanation}
-                        onChange={(event) => updateChallengeQuestion(questionIndex, { explanation: event.target.value })}
-                        maxLength={600}
-                        rows={2}
-                        required
-                        placeholder="Explicación"
-                        style={{ ...editorInputStyle, resize: "vertical" }}
-                      />
+                      <label>
+                        Explicación si responde correctamente
+                        <textarea
+                          aria-label={`Explicación de respuesta correcta ${questionIndex + 1}`}
+                          value={question.correctExplanation}
+                          onChange={(event) => updateChallengeQuestion(questionIndex, { correctExplanation: event.target.value })}
+                          maxLength={600}
+                          rows={2}
+                          required
+                          placeholder="Explicá por qué la respuesta es correcta"
+                          style={{ ...editorInputStyle, resize: "vertical" }}
+                        />
+                      </label>
+                      <label>
+                        Mensaje si responde incorrectamente (para volver a intentar)
+                        <textarea
+                          aria-label={`Mensaje para volver a intentar ${questionIndex + 1}`}
+                          value={question.retryExplanation}
+                          onChange={(event) => updateChallengeQuestion(questionIndex, { retryExplanation: event.target.value })}
+                          maxLength={600}
+                          rows={2}
+                          required
+                          placeholder="Dale una pista o animá a intentarlo de nuevo"
+                          style={{ ...editorInputStyle, resize: "vertical" }}
+                        />
+                      </label>
                       {challengeDraft.questions.length > 1 && (
                         <button
                           type="button"
@@ -3641,7 +3418,8 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                         correctIndex: 0,
                         correctIndexes: [0],
                         multiSelect: false,
-                        explanation: "",
+                        correctExplanation: "",
+                        retryExplanation: "",
                       }],
                     })}
                     style={editorActionButtonStyle}
@@ -3671,7 +3449,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                   {type === "npc" && (
                     <button type="button" onClick={() => openChallengeEditor(type, item)} style={editorActionButtonStyle}>Desafío</button>
                   )}
-                  {type === "pista" && ["mito", "fragment"].includes(item.type) && (
+                  {type === "pista" && ["mito", "fragment", "pista"].includes(item.type) && (
                     <button type="button" onClick={() => openChallengeEditor(type, item)} style={editorActionButtonStyle}>Desafío</button>
                   )}
                   <button type="button" onClick={() => removeEntity(type, item.id)} style={editorActionButtonStyle}>×</button>
@@ -3789,6 +3567,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           questions={modal.questions}
           title={modal.title || (modal.npc?.name ? `DESAFÍO · ${modal.npc.name}` : "MITO O REALIDAD")}
           presentation={modal.presentation}
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={() => {
             if (modal.npc) {
               runtimeRef.current.doneNpcs[modal.npc.id] = true;
@@ -3798,6 +3577,15 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
             }
             if (modal.obj) {
               runtimeRef.current.doneObjects[modal.obj.id] = true;
+              if (modal.obj.type === "pista") {
+                collectInventoryItem({
+                  emoji: modal.obj.emoji,
+                  label: modal.obj.label,
+                  text: modal.obj.text,
+                });
+                playSound("pickup");
+                showToast(`📌 Pista encontrada: ${modal.obj.label}`);
+              }
               if (modal.obj.starIndex) markStar(modal.obj.starIndex);
             }
             playSound("correct");
@@ -3810,6 +3598,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
 
       {modal && modal.kind === "dragdrop" && (
         <DragDropModal
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={() => {
             runtimeRef.current.doneObjects["dragdrop_done"] = true;
             markStar(2);
@@ -3822,6 +3611,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       {modal && modal.kind === "quiz_multi" && (
         <MultiQuizModal
           questions={ITS_QUIZ}
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={() => {
             runtimeRef.current.doneObjects["enfermera_rosa_done"] = true;
             runtimeRef.current.doneNpcs[modal.npc.id] = true;
@@ -3835,6 +3625,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       {modal && modal.kind === "scenarios_multi" && (
         <ScenarioModal
           scenarios={modal.ch.scenarioIds.map((id) => SCENARIOS_DATA.find((s) => s.id === id))}
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={() => {
             runtimeRef.current.doneObjects["doctor_lucas_done"] = true;
             runtimeRef.current.doneNpcs[modal.npc.id] = true;
@@ -3848,6 +3639,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       {modal && modal.kind === "scenario_single" && (
         <ScenarioModal
           scenarios={[modal.scenario]}
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={() => {
             runtimeRef.current.doneNpcs[modal.npc.id] = true;
             if (modal.ch.starIndex) markStar(modal.ch.starIndex);
@@ -3860,6 +3652,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       {modal && modal.kind === "fragment" && (
         <FragmentModal
           mission={modal.mission}
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={(correct) => {
             if (correct) {
               runtimeRef.current.doneObjects[modal.obj.id] = true;
@@ -3877,6 +3670,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           questions={modal.questions}
           title={modal.title || modal.mission?.label || "FRAGMENTO"}
           presentation={modal.presentation || "multiple"}
+          onIncorrectAnswer={registerIncorrectAnswer}
           onFinish={() => {
             runtimeRef.current.doneObjects[modal.obj.id] = true;
             collectInventoryItem({
@@ -4441,8 +4235,7 @@ export default function JobQuestGame() {
   function computeUnlocks(p) {
     const np = { ...p, liceo: { ...p.liceo, unlocked: true } };
     np.rumores = { ...np.rumores, unlocked: np.liceo.completed };
-    const combo = np.liceo.stars + np.rumores.stars;
-    np.centro = { ...np.centro, unlocked: combo >= 4 };
+    np.centro = { ...np.centro, unlocked: np.rumores.completed };
     np.mision = { ...np.mision, unlocked: np.liceo.completed && np.rumores.completed && np.centro.completed };
     return np;
   }
@@ -4511,8 +4304,9 @@ export default function JobQuestGame() {
 
       {screen === "game" && currentLevelId && (
         currentLevelId === "mision" ? (
-          <FinalMissionScreen
+          <InterviewBattle
             character={character}
+            language={language}
             onComplete={(stars) => handleLevelFinished("mision", stars)}
           />
         ) : (
@@ -4546,202 +4340,6 @@ const styles = {
     boxSizing: "border-box",
     fontFamily: "'Inter', sans-serif",
     color: "#F5F5F5",
-  },
-  finalMission: {
-    position: "relative",
-    width: "calc(100vw - 24px)",
-    maxWidth: 1800,
-    minHeight: "min(900px, 97vh)",
-    boxSizing: "border-box",
-    overflow: "visible",
-    borderRadius: 18,
-    background: `#09152F url('${publicAsset("final-mission/background.png")}') center / cover`,
-    boxShadow: "0 12px 0 rgba(0,0,0,0.35)",
-    padding: 22,
-    fontFamily: "'Inter', sans-serif",
-  },
-  finalMissionOverlay: {
-    minHeight: "min(700px, 86vh)",
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    padding: 30,
-    background: "rgba(5,12,32,0.72)",
-    borderRadius: 14,
-  },
-  certificateBox: {
-    width: "min(760px, 92vw)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 12,
-    margin: "12px 0 18px",
-  },
-  certificatePreview: {
-    position: "relative",
-    width: "100%",
-    lineHeight: 0,
-    borderRadius: 10,
-    overflow: "hidden",
-    boxShadow: "0 8px 20px rgba(0,0,0,.35)",
-  },
-  certificatePreviewImage: {
-    display: "block",
-    width: "100%",
-    height: "auto",
-  },
-  certificateName: {
-    position: "absolute",
-    left: "22%",
-    top: "37.5%",
-    width: "56%",
-    color: "#123B73",
-    fontFamily: "'Inter', sans-serif",
-    fontSize: "clamp(16px, 3.3vw, 42px)",
-    fontWeight: 700,
-    lineHeight: 1.1,
-    textAlign: "center",
-    whiteSpace: "nowrap",
-  },
-  certificateError: {
-    color: "#FFB4C6",
-    fontSize: 13,
-    margin: 0,
-  },
-  finalMissionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 18,
-    color: "#F5F5F5",
-    fontSize: 15,
-    letterSpacing: 1,
-    padding: "8px 12px 20px",
-  },
-  finalMissionLayout: {
-    display: "grid",
-    gridTemplateColumns: "minmax(150px, .55fr) minmax(0, 2.5fr) minmax(190px, .8fr)",
-    alignItems: "center",
-    gap: 18,
-    minHeight: 700,
-  },
-  finalMissionVisuals: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    height: "100%",
-  },
-  finalMissionDoctor: { width: "min(190px, 100%)", maxHeight: 330, objectFit: "contain" },
-  finalMissionIntro: {
-    display: "flex",
-    alignItems: "center",
-    gap: 24,
-    maxWidth: 760,
-    margin: "8px auto 14px",
-  },
-  finalMissionIntroDoctor: {
-    position: "relative",
-    width: 300,
-    height: 390,
-    overflow: "hidden",
-    flexShrink: 0,
-    borderRadius: 14,
-    background: "rgba(0,0,0,.22)",
-  },
-  finalMissionIntroDoctorImage: {
-    position: "absolute",
-    inset: 0,
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-  },
-  finalMissionCity: { width: "100%", maxWidth: 360, marginTop: 12, objectFit: "contain" },
-  finalMissionBoss: { width: "min(300px, 100%)", maxHeight: 360, objectFit: "contain", justifySelf: "center" },
-  finalMissionBossPanel: {
-    minHeight: 430,
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 12,
-    borderRadius: 16,
-    background: "rgba(4,12,30,.35)",
-  },
-  finalMissionCard: {
-    minWidth: 0,
-    background: "rgba(10,20,42,0.94)",
-    border: "2px solid #8DB4FF",
-    borderRadius: 16,
-    padding: 28,
-    boxShadow: "0 8px 0 rgba(0,0,0,.28)",
-  },
-  finalMissionBar: {
-    height: 12,
-    marginTop: 9,
-    background: "rgba(255,255,255,.12)",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  finalMissionAnswer: {
-    textAlign: "left",
-    border: "2px solid #8DB4FF",
-    borderRadius: 9,
-    padding: "11px 13px",
-    background: "rgba(141,180,255,.1)",
-    color: "#F5F5F5",
-    cursor: "pointer",
-    fontSize: 14,
-  },
-  finalMissionArena: {
-    position: "relative",
-    height: "min(440px, 52vh)",
-    minHeight: 260,
-    marginTop: 14,
-    border: "2px dashed rgba(141,180,255,.55)",
-    borderRadius: 12,
-    background: `linear-gradient(rgba(4,16,7,.46), rgba(4,16,7,.46)), url('${publicAsset("final-mission/arena-organisms.png")}') center / cover`,
-    overflow: "hidden",
-  },
-  finalMissionTarget: {
-    position: "absolute",
-    transform: "translate(-50%, -50%)",
-    minWidth: 140,
-    minHeight: 48,
-    padding: "12px 16px",
-    border: "2px solid #8DB4FF",
-    borderRadius: 10,
-    background: "rgba(16,22,58,.95)",
-    color: "#F5F5F5",
-    cursor: "crosshair",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 2,
-    fontSize: 16,
-    fontWeight: 700,
-    textAlign: "center",
-    whiteSpace: "nowrap",
-  },
-  finalMissionPlayer: {
-    position: "absolute",
-    width: 110,
-    height: 145,
-    backgroundImage: `url('${publicAsset("final-mission/doctor-idle-walk.png")}')`,
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "1303px 145px",
-    backgroundColor: "transparent",
-    pointerEvents: "none",
-    zIndex: 3,
-    filter: "drop-shadow(0 3px 3px rgba(0,0,0,.5))",
-  },
-  finalMissionProjectile: {
-    position: "absolute",
-    transform: "translate(-50%, -50%)",
-    fontSize: 20,
-    zIndex: 2,
   },
   centerScreen: {
     display: "flex",
