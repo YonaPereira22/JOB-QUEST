@@ -153,7 +153,7 @@ function editorDataPlugin() {
 
 export default defineConfig({
   plugins: [react(), editorDataPlugin()],
-  base: '/',
+  base: process.env.GITHUB_ACTIONS === 'true' ? '/JOB-QUEST/' : '/',
   server: {
     watch: {
       usePolling: true,

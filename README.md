@@ -121,3 +121,7 @@ Vite mostrará en la terminal la dirección local para abrir el juego. Para gene
 ```bash
 npm run build
 ```
+
+## Publicar en GitHub Pages
+
+El workflow `.github/workflows/deploy-pages.yml` construye y publica el sitio al actualizar `main`. En el repositorio, abrí **Settings → Pages** y elegí **GitHub Actions** como fuente de publicación. El build de Actions usa `/JOB-QUEST/` como ruta base del sitio del proyecto, mientras que el servidor local usa `/`.
