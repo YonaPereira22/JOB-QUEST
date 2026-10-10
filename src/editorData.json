@@ -847,6 +847,550 @@
           "label": "EXIT →"
         }
       }
+    },
+    "rumores": {
+      "walls": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 1152,
+          "h": 24
+        },
+        {
+          "x": 0,
+          "y": 744,
+          "w": 1152,
+          "h": 24
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "w": 24,
+          "h": 768
+        },
+        {
+          "x": 1128,
+          "y": 0,
+          "w": 24,
+          "h": 768
+        },
+        {
+          "x": 472.00001525878906,
+          "y": 112.33333778381348,
+          "w": 188.66668701171875,
+          "h": 152.00001525878906
+        },
+        {
+          "x": 150.00001525878906,
+          "y": 25.66666603088379,
+          "w": 204,
+          "h": 200
+        },
+        {
+          "x": 96.66667175292969,
+          "y": 384.00000953674316,
+          "w": 196,
+          "h": 146.66665649414062
+        },
+        {
+          "x": 301.3333282470703,
+          "y": 396.6666660308838,
+          "w": 56,
+          "h": 122
+        },
+        {
+          "x": 32.66667175292969,
+          "y": 592.6666660308838,
+          "w": 136,
+          "h": 22
+        },
+        {
+          "x": 274.00001525878906,
+          "y": 600.0000400543213,
+          "w": 95.33331298828125,
+          "h": 10
+        },
+        {
+          "x": 250.00001525878906,
+          "y": 632.6666660308838,
+          "w": 134,
+          "h": 24.66668701171875
+        },
+        {
+          "x": 368.6667022705078,
+          "y": 657.3333530426025,
+          "w": 123.33331298828125,
+          "h": 43.33331298828125
+        },
+        {
+          "x": 30,
+          "y": 622.6666660308838,
+          "w": 138.00001525878906,
+          "h": 32.66668701171875
+        },
+        {
+          "x": 269.3333282470703,
+          "y": 616.6666660308838,
+          "w": 112.66668701171875,
+          "h": 16.66668701171875
+        },
+        {
+          "x": 484.12001525878725,
+          "y": 657.6666660308838,
+          "w": 22.666656494140625,
+          "h": 49.3333740234375
+        },
+        {
+          "x": 620.1200152587872,
+          "y": 651.0000400543213,
+          "w": 236,
+          "h": 30
+        },
+        {
+          "x": 622.786702270506,
+          "y": 670.3333530426025,
+          "w": 236,
+          "h": 26
+        },
+        {
+          "x": 816.0000152587891,
+          "y": 114.33333778381348,
+          "w": 224.66668701171875,
+          "h": 112.66667175292969
+        },
+        {
+          "x": 783.3333282470703,
+          "y": 163.6666660308838,
+          "w": 29.3333740234375,
+          "h": 145.33334350585938
+        },
+        {
+          "x": 1034.6667022705078,
+          "y": 304.33335304260254,
+          "w": 110,
+          "h": 26
+        },
+        {
+          "x": 1030.000015258789,
+          "y": 35.000009536743164,
+          "w": 91.33331298828125,
+          "h": 102.66665649414062
+        },
+        {
+          "x": 765.3333282470703,
+          "y": 21.66666603088379,
+          "w": 271.3333740234375,
+          "h": 84
+        },
+        {
+          "x": 790.0000152587891,
+          "y": 399.08000953673616,
+          "w": 352.66668701171875,
+          "h": 135.33334350585938
+        },
+        {
+          "x": 968.6667022705078,
+          "y": 335.41335304259553,
+          "w": 25.33331298828125,
+          "h": 57.33331298828125
+        },
+        {
+          "x": 932.6667022705078,
+          "y": 619.6666660308838,
+          "w": 206,
+          "h": 128.66668701171875
+        },
+        {
+          "x": 454.6666717529297,
+          "y": 501.6666660308838,
+          "w": 20,
+          "h": 51.333343505859375
+        },
+        {
+          "x": 474.6666717529297,
+          "y": 553.0000095367432,
+          "w": 53.333343505859375,
+          "h": 17.333343505859375
+        },
+        {
+          "x": 612.0000152587891,
+          "y": 560.3333530426025,
+          "w": 67.33331298828125,
+          "h": 10.666656494140625
+        },
+        {
+          "x": 680.6667022705078,
+          "y": 501.6666660308838,
+          "w": 10,
+          "h": 58
+        },
+        {
+          "x": 676.0000152587891,
+          "y": 398.33335304260254,
+          "w": 10.66668701171875,
+          "h": 48.666656494140625
+        },
+        {
+          "x": 586.6666717529297,
+          "y": 380.33335304260254,
+          "w": 86.66665649414062,
+          "h": 25.33331298828125
+        },
+        {
+          "x": 461.6267022705114,
+          "y": 385.00000953674316,
+          "w": 63.33331298828125,
+          "h": 20
+        },
+        {
+          "x": 530.2933282470739,
+          "y": 454.33335304260254,
+          "w": 74,
+          "h": 40.666656494140625
+        },
+        {
+          "x": 453.3333282470703,
+          "y": 40.33333778381348,
+          "w": 128,
+          "h": 50
+        },
+        {
+          "x": 485.980015258782,
+          "y": 711.0000400543213,
+          "w": 30.000000000000057,
+          "h": 32
+        },
+        {
+          "x": 612.6467022705008,
+          "y": 705.6666660308838,
+          "w": 22,
+          "h": 32.66668701171875
+        },
+        {
+          "x": 519.3133282470633,
+          "y": 729.6666660308838,
+          "w": 96,
+          "h": 16
+        },
+        {
+          "x": 802.0000152587891,
+          "y": 701.6666660308838,
+          "w": 26,
+          "h": 42.66668701171875
+        },
+        {
+          "x": 26,
+          "y": 380.42335304263395,
+          "w": 69.33332824707031,
+          "h": 139.33331298828125
+        },
+        {
+          "x": 29.333328247070312,
+          "y": 300.72666603088726,
+          "w": 52.66668701171875,
+          "h": 10
+        },
+        {
+          "x": 58,
+          "y": 197.6666660308838,
+          "w": 19.333328247070312,
+          "h": 100.66668701171875
+        },
+        {
+          "x": 154.00001525878906,
+          "y": 659.6566660308804,
+          "w": 18,
+          "h": 21.3333740234375
+        },
+        {
+          "x": 176.00001525878906,
+          "y": 686.3233530425991,
+          "w": 54,
+          "h": 9.33331298828125
+        },
+        {
+          "x": 239.3333282470703,
+          "y": 641.6566660308804,
+          "w": 11.333343505859375,
+          "h": 48.66668701171875
+        },
+        {
+          "x": 180.6666717529297,
+          "y": 673.6666660308838,
+          "w": 68,
+          "h": 9.3333740234375
+        },
+        {
+          "x": 520.0377535881624,
+          "y": 721.0000400543213,
+          "w": 91.33331298828125,
+          "h": 9.33331298828125
+        }
+      ],
+      "content": {
+        "npcs": [
+          {
+            "id": "editor-npc-1791592022164",
+            "x": 192.48503480696814,
+            "y": 551.5570401455809,
+            "name": "Alice",
+            "emoji": "🧑‍💼",
+            "color": "#476cff",
+            "gender": "female",
+            "skin": "#F6C9A7",
+            "hair": "#342B35",
+            "hairStyle": "long",
+            "dialogue": [
+              "Welcome to the World of Work!",
+              "Today, you will meet different workers and discover their jobs. Each person has different tasks and responsibilities.",
+              "Visit the workers, complete their challenges and earn points. Are you ready?"
+            ],
+            "editorCreated": true
+          },
+          {
+            "id": "editor-npc-1791592125232",
+            "x": 244.3333511352539,
+            "y": 262.6270592190393,
+            "name": "Dra. Charlotte",
+            "emoji": "🧑‍💼",
+            "color": "#6e80c9",
+            "gender": "female",
+            "skin": "#837163",
+            "hair": "#ffffff",
+            "hairStyle": "long",
+            "dialogue": [
+              "Which of the following are typical responsibilities of a doctor?",
+              "Select TWO answers."
+            ],
+            "editorCreated": true,
+            "challenge": {
+              "type": "editor",
+              "challengeId": "npc:editor-npc-1791592125232",
+              "starIndex": 1
+            }
+          },
+          {
+            "id": "editor-npc-1791592363951",
+            "x": 542.5350195481791,
+            "y": 251.24371571317994,
+            "name": "Chef. Max",
+            "emoji": "🧑‍💼",
+            "color": "#ffffff",
+            "gender": "male",
+            "skin": "#5d3f27",
+            "hair": "#c8a00e",
+            "hairStyle": "short",
+            "dialogue": [
+              "A Problem in the Restaurant"
+            ],
+            "editorCreated": true,
+            "challenge": {
+              "type": "editor",
+              "challengeId": "npc:editor-npc-1791592363951",
+              "starIndex": 1
+            }
+          },
+          {
+            "id": "editor-npc-1791592583938",
+            "x": 975.0000305175781,
+            "y": 257.6666450500488,
+            "name": "Mechanic. Alex",
+            "emoji": "🧑‍💼",
+            "color": "#000000",
+            "gender": "male",
+            "skin": "#F6C9A7",
+            "hair": "#342B35",
+            "hairStyle": "short",
+            "dialogue": [
+              "A customer says the car makes a strange noise when the engine starts. Which actions are part of a mechanic's job? Select TWO answers."
+            ],
+            "editorCreated": true,
+            "challenge": {
+              "type": "editor",
+              "challengeId": "npc:editor-npc-1791592583938",
+              "starIndex": 1
+            }
+          },
+          {
+            "id": "editor-npc-1791592755149",
+            "x": 886.3333129882812,
+            "y": 537,
+            "name": "Victoria Pilots",
+            "emoji": "🧑‍💼",
+            "color": "#04127c",
+            "gender": "female",
+            "skin": "#563d29",
+            "hair": "#cd97d3",
+            "hairStyle": "long",
+            "dialogue": [
+              "Before a flight, a pilot notices a warning light in the cockpit. What is the most responsible decision?"
+            ],
+            "editorCreated": true,
+            "challenge": {
+              "type": "editor",
+              "challengeId": "npc:editor-npc-1791592755149",
+              "starIndex": 1
+            }
+          },
+          {
+            "id": "editor-npc-1791593038413",
+            "x": 877.6666870117188,
+            "y": 674.333333492279,
+            "name": "Pablo the Fisherman",
+            "emoji": "🧑‍💼",
+            "color": "#ff4747",
+            "gender": "neutral",
+            "skin": "#F6C9A7",
+            "hair": "#352c34",
+            "hairStyle": "short",
+            "dialogue": [
+              "A fisherman finds plastic waste near his fishing area. What is the most responsible action?"
+            ],
+            "editorCreated": true,
+            "challenge": {
+              "type": "editor",
+              "challengeId": "npc:editor-npc-1791593038413",
+              "starIndex": 1
+            }
+          }
+        ],
+        "objects": [],
+        "npcOverrides": {},
+        "objectOverrides": {},
+        "removedNpcIds": [
+          "sofia",
+          "facu",
+          "bruno",
+          "male",
+          "ana",
+          "vero"
+        ],
+        "removedObjectIds": [
+          "hidden_phone"
+        ],
+        "removedChallengeIds": [],
+        "challengeOverrides": {
+          "npc:editor-npc-1791592125232": {
+            "id": "npc:editor-npc-1791592125232",
+            "title": "Desafío de Dra. Charlotte",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Which of the following are typical responsibilities of a doctor? Select TWO answers.",
+                "options": [
+                  "Examining patients and diagnosing illnesses.",
+                  "Preparing meals for restaurant customers.",
+                  "Prescribing treatment when necessary.",
+                  "Repairing engines and replacing car parts."
+                ],
+                "correctIndex": 0,
+                "correctIndexes": [
+                  0,
+                  2
+                ],
+                "multiSelect": true,
+                "explanation": "Muy bien."
+              }
+            ]
+          },
+          "npc:editor-npc-1791592363951": {
+            "id": "npc:editor-npc-1791592363951",
+            "title": "Desafío de Chef. Max",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A customer has a food allergy. What should a chef do?",
+                "options": [
+                  "Ignore the allergy and prepare the usual meal.",
+                  "Check the ingredients and prepare a safe meal.",
+                  "Ask the customer to cook the meal.",
+                  "Serve the meal without explaining its ingredients."
+                ],
+                "correctIndex": 1,
+                "correctIndexes": [
+                  1
+                ],
+                "multiSelect": true,
+                "explanation": "Muy bien."
+              }
+            ]
+          },
+          "npc:editor-npc-1791592583938": {
+            "id": "npc:editor-npc-1791592583938",
+            "title": "Desafío de Mechanic. Alex",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A customer says the car makes a strange noise when the engine starts. Which actions are part of a mechanic's job? Select TWO answers.",
+                "options": [
+                  "Inspect the engine to identify the problem.",
+                  "Prepare a flight plan.",
+                  "Prescribe medicine to the driver.",
+                  "Repair or replace damaged parts."
+                ],
+                "correctIndex": 0,
+                "correctIndexes": [
+                  0,
+                  3
+                ],
+                "multiSelect": true,
+                "explanation": "Muy bien"
+              }
+            ]
+          },
+          "npc:editor-npc-1791592755149": {
+            "id": "npc:editor-npc-1791592755149",
+            "title": "Desafío de Victoria Pilots",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "Before a flight, a pilot notices a warning light in the cockpit. What is the most responsible decision?",
+                "options": [
+                  "Ignore the warning and take off.",
+                  "Report the problem and follow safety procedures.",
+                  "Ask a passenger to repair the aircraft.",
+                  "Continue without checking the warning."
+                ],
+                "correctIndex": 1,
+                "correctIndexes": [
+                  1
+                ],
+                "multiSelect": true,
+                "explanation": "Muy bien"
+              }
+            ]
+          },
+          "npc:editor-npc-1791593038413": {
+            "id": "npc:editor-npc-1791593038413",
+            "title": "Desafío de Pablo the Fisherman",
+            "presentation": "multiple",
+            "questions": [
+              {
+                "text": "A fisherman finds plastic waste near his fishing area. What is the most responsible action?",
+                "options": [
+                  "Leave the waste in the water.",
+                  "Throw more rubbish into the water.",
+                  "Dispose of the waste properly and help keep the area clean.",
+                  "Ignore the problem because it is not his job."
+                ],
+                "correctIndex": 2,
+                "correctIndexes": [
+                  2
+                ],
+                "multiSelect": false,
+                "explanation": "Muy bien."
+              }
+            ]
+          }
+        },
+        "exit": {
+          "x": 504.0950314085229,
+          "y": 671.0000205039978,
+          "w": 100,
+          "h": 60,
+          "label": "EXIT →"
+        }
+      }
     }
   }
 }
