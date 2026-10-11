@@ -3,6 +3,35 @@ import projectEditorData from "./editorData.json";
 import InterviewBattle from "./InterviewBattle.jsx";
 
 const publicAsset = (path) => `${import.meta.env.BASE_URL}${path}`;
+const npcImageAsset = (npc) => npc.imageUrl
+  ? publicAsset(npc.imageUrl.replace(/^\/+/, ""))
+  : null;
+
+async function prepareNpcImage(file) {
+  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+    throw new Error("Elegí una imagen PNG, JPG o WebP.");
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error("La imagen original no puede superar los 10 MB.");
+  }
+
+  const sourceUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = sourceUrl;
+    await image.decode();
+    const scale = Math.min(1, 1024 / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("No se pudo preparar la imagen en este navegador.");
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/png");
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
 
 /* ================================================================
    JOB QUEST: BUILD YOUR FUTURE
@@ -636,21 +665,21 @@ function buildLevels() {
         emoji: "👩🏽‍🏫",
         color: "#FFD166",
         dialogue: [
-          "¡Necesito tu ayuda! En el liceo aparecieron cinco carteles sobre distintas profesiones, pero algunos podrían tener información falsa.",
-          "Recorré las aulas y revisá cada cartel: fijate qué hace cada profesional y dónde trabaja. Si algo no coincide, marcálo como mito.",
-          "También podés conversar con Seño Laura para aprender sobre la docencia. Cuando termines de revisar los carteles, vení a hablar con Cami para resolver la situación y seguir la ruta.",
+          "I need your help! Five posters about different professions have appeared at school, but some may contain false information.",
+          "Explore the classrooms and check each poster: learn what each professional does and where they work. If something does not match, mark it as a myth.",
+          "You can also talk to Laura to learn about teaching. When you finish checking the posters, talk to Cami to solve the situation and continue your journey.",
         ],
       },
       {
         id: "teacher_guide",
         x: 650,
         y: 780,
-        name: "Seño Laura",
+        name: "Laura",
         emoji: "👩🏻‍🏫",
         color: "#7CE0C6",
         dialogue: [
-          "Ser docente es mucho más que explicar temas: también preparo actividades, acompaño a mis estudiantes y los ayudo a aprender.",
-          "Para ayudar a Prof. Mateo, revisemos con cuidado qué dice cada cartel sobre las profesiones.",
+          "Being a teacher is about more than explaining topics: I also prepare activities, support my students, and help them learn.",
+          "To help Professor Mateo, let's carefully review what each poster says about the professions.",
         ],
         challenge: { type: "mc", dataId: "mc_teacher_clues", starIndex: 1 },
       },
@@ -662,29 +691,29 @@ function buildLevels() {
         emoji: "🧑🏽",
         color: "#FF8FB1",
         dialogue: [
-          "Che, ¿puedo preguntarte algo?",
+          "Hey, can I ask you something?",
         ],
         challenge: { type: "decision", scenarioId: "scen_liceo", starIndex: 3 },
       },
     ],
     objects: [
-      { id: "msg1", x: 380, y: 90, type: "mito", emoji: "📄", label: "Cartel del aula 1A", dataId: "myth1" },
-      { id: "msg2", x: 610, y: 90, type: "mito", emoji: "📄", label: "Cartel del aula 1B", dataId: "myth2" },
-      { id: "msg3", x: 850, y: 90, type: "mito", emoji: "📄", label: "Cartel del aula 1C", dataId: "myth3" },
-      { id: "msg4", x: 1090, y: 90, type: "mito", emoji: "📄", label: "Cartel del aula 1D", dataId: "myth4" },
-      { id: "msg5", x: 1360, y: 500, type: "mito", emoji: "📄", label: "Cartel del aula 2D", dataId: "myth5" },
+      { id: "msg1", x: 380, y: 90, type: "mito", emoji: "📄", label: "Classroom 1A poster", dataId: "myth1" },
+      { id: "msg2", x: 610, y: 90, type: "mito", emoji: "📄", label: "Classroom 1B poster", dataId: "myth2" },
+      { id: "msg3", x: 850, y: 90, type: "mito", emoji: "📄", label: "Classroom 1C poster", dataId: "myth3" },
+      { id: "msg4", x: 1090, y: 90, type: "mito", emoji: "📄", label: "Classroom 1D poster", dataId: "myth4" },
+      { id: "msg5", x: 1360, y: 500, type: "mito", emoji: "📄", label: "Classroom 2D poster", dataId: "myth5" },
       {
         id: "hidden_book",
         x: 1360,
         y: 590,
         type: "pista",
         emoji: "📖",
-        label: "Libro",
-        text: "Pista secreta: el consentimiento y el diálogo también son parte del autocuidado.",
+        label: "Book",
+        text: "Secret clue: consent and open communication are also part of self-care.",
         starIndex: 2,
       },
     ],
-    exit: { x: 640, y: 590, w: 260, h: 40, label: "PUERTA PRINCIPAL" },
+    exit: { x: 640, y: 590, w: 260, h: 40, label: "MAIN EXIT" },
     objectivesRequired: ["msg1", "msg2", "msg3", "msg4", "msg5"],
   };
 
@@ -722,12 +751,12 @@ function buildLevels() {
         id: "sofia",
         x: 220,
         y: 285,
-        name: "Sofía",
+        name: "Sofia",
         emoji: "🧑🏻",
         color: "#7CE0C6",
         skin: "#F6C9A7",
         hair: "#342B35",
-        dialogue: ["Che, ¿es verdad lo que me dijeron por el chat?"],
+        dialogue: ["Hey, is what they told me in the chat true?"],
         challenge: { type: "truefalse", dataId: "tf1", starIndex: 1 },
       },
       {
@@ -739,7 +768,7 @@ function buildLevels() {
         color: "#FFD166",
         skin: "#8D5524",
         hair: "#201A1C",
-        dialogue: ["Tengo una duda de algo que leí por ahí."],
+        dialogue: ["I have a question about something I read."],
         challenge: { type: "truefalse", dataId: "tf2", starIndex: 1 },
       },
       {
@@ -751,7 +780,7 @@ function buildLevels() {
         color: "#8DB4FF",
         skin: "#D39A73",
         hair: "#5A3A2E",
-        dialogue: ["Un amigo me contó cómo se cuida y no sé si es tan así."],
+        dialogue: ["A friend told me how to stay safe, but I am not sure if that is right."],
         challenge: { type: "truefalse", dataId: "tf3", starIndex: 1 },
       },
       {
@@ -763,7 +792,7 @@ function buildLevels() {
         color: "#FF8FB1",
         skin: "#B97850",
         hair: "#342B35",
-        dialogue: ["¿Vos sabés bien cuáles son los métodos de prevención?"],
+        dialogue: ["Do you know which prevention methods are effective?"],
         challenge: { type: "mc", dataId: "mc1", starIndex: 1 },
       },
       {
@@ -775,7 +804,7 @@ function buildLevels() {
         color: "#C6F135",
         skin: "#F6C9A7",
         hair: "#6B3F2A",
-        dialogue: ["Si tenés dudas de verdad, ¿a quién le preguntás?"],
+        dialogue: ["If you have questions, who should you ask?"],
         challenge: { type: "mc", dataId: "mc2", starIndex: 1 },
       },
       {
@@ -787,7 +816,7 @@ function buildLevels() {
         color: "#FF8FB1",
         skin: "#8D5524",
         hair: "#201A1C",
-        dialogue: ["Me llegó un mensaje que me dejó re preocupada, no sé qué hacer."],
+        dialogue: ["I received a message that really worried me, and I do not know what to do."],
         challenge: { type: "decision", scenarioId: "scen_red", starIndex: 3 },
       },
     ],
@@ -798,12 +827,12 @@ function buildLevels() {
         y: 250,
         type: "pista",
         emoji: "📱",
-        label: "Celular perdido",
-        text: "Pista secreta: antes de reenviar algo, revisá si viene de una fuente confiable.",
+        label: "Lost phone",
+        text: "Secret clue: before forwarding a message, check whether it comes from a reliable source.",
         starIndex: 2,
       },
     ],
-    exit: { x: 510, y: 650, w: 130, h: 40, label: "SALIDA" },
+    exit: { x: 510, y: 650, w: 130, h: 40, label: "EXIT" },
     objectivesRequired: ["sofia", "bruno", "facu", "male", "ana"],
     objectivesAreNpcs: true,
   };
@@ -871,9 +900,9 @@ function buildLevels() {
       { x: 575, y: 350, emoji: "🪑", size: 30 },
     ],
     labels: [
-      { x: 140, y: 45, text: "SALA 1 · ITS" },
-      { x: 735, y: 45, text: "SALA 2 · MÉTODOS" },
-      { x: 385, y: 520, text: "SALA 3 · DECISIONES" },
+      { x: 140, y: 45, text: "ROOM 1 · STIs" },
+      { x: 735, y: 45, text: "ROOM 2 · METHODS" },
+      { x: 385, y: 520, text: "ROOM 3 · DECISIONS" },
     ],
     npcs: [
       {
@@ -884,7 +913,7 @@ function buildLevels() {
         emoji: "🧑🏽‍⚕️",
         color: "#8DB4FF",
         dialogue: [
-          "Leé las cuatro fichas de ITS que están en la sala y después charlamos.",
+          "Read the four STI information cards in the room, then let's talk.",
         ],
         challenge: { type: "quiz_multi", dataKey: "ITS_QUIZ", starIndex: 1, requires: ["its_vih", "its_sifilis", "its_gonorrea", "its_vph"] },
       },
@@ -895,26 +924,26 @@ function buildLevels() {
         name: "Dr. Lucas",
         emoji: "🧑🏾‍⚕️",
         color: "#C6F135",
-        dialogue: ["Te propongo pensar juntos un par de situaciones de la vida real."],
+        dialogue: ["Let's think through a couple of real-life situations together."],
         challenge: { type: "scenarios_multi", scenarioIds: ["scen1", "scen2"], starIndex: 3 },
       },
     ],
     objects: [
-      { id: "its_vih", x: 150, y: 70, type: "infocard", emoji: "🗂️", label: "Ficha", dataId: "vih" },
-      { id: "its_sifilis", x: 775, y: 70, type: "infocard", emoji: "🗂️", label: "Ficha", dataId: "sifilis" },
-      { id: "its_gonorrea", x: 150, y: 245, type: "infocard", emoji: "🗂️", label: "Ficha", dataId: "gonorrea" },
-      { id: "its_vph", x: 150, y: 385, type: "infocard", emoji: "🗂️", label: "Ficha", dataId: "vph" },
+      { id: "its_vih", x: 150, y: 70, type: "infocard", emoji: "🗂️", label: "Information card", dataId: "vih" },
+      { id: "its_sifilis", x: 775, y: 70, type: "infocard", emoji: "🗂️", label: "Information card", dataId: "sifilis" },
+      { id: "its_gonorrea", x: 150, y: 245, type: "infocard", emoji: "🗂️", label: "Information card", dataId: "gonorrea" },
+      { id: "its_vph", x: 150, y: 385, type: "infocard", emoji: "🗂️", label: "Information card", dataId: "vph" },
       {
         id: "dragdrop_station",
         x: 790,
         y: 385,
         type: "dragdrop",
         emoji: "🗃️",
-        label: "Mesa de clasificación",
+        label: "Classification table",
         starIndex: 2,
       },
     ],
-    exit: { x: 510, y: 700, w: 130, h: 40, label: "SALIDA" },
+    exit: { x: 510, y: 700, w: 130, h: 40, label: "EXIT" },
     objectivesRequired: ["enfermera_rosa_done", "dragdrop_done", "doctor_lucas_done"],
     customObjectives: true,
   };
@@ -936,7 +965,7 @@ function buildLevels() {
       { x: 300, y: 750, emoji: "🌳", size: 36 },
       { x: 1200, y: 750, emoji: "🌳", size: 36 },
     ],
-    labels: [{ x: 40, y: 40, text: "PLAZOLETA DEL LICEO" }],
+    labels: [{ x: 40, y: 40, text: "SCHOOL COURTYARD" }],
     npcs: [
       {
         id: "marcos",
@@ -946,9 +975,9 @@ function buildLevels() {
         emoji: "🧑🏻‍🏫",
         color: "#FFD166",
         dialogue: [
-          "Che, necesitamos armar información confiable para compartir en el liceo.",
-          "Recorré la plazoleta y conseguí los cinco fragmentos: ITS, prevención, métodos, mitos y autocuidado.",
-          "Cada uno está protegido por un desafío. ¡Suerte!",
+          "Hey, we need to put together reliable information to share at school.",
+          "Explore the courtyard and collect the five fragments: STIs, prevention, methods, myths, and self-care.",
+          "Each one is protected by a challenge. Good luck!",
         ],
       },
     ],
@@ -968,7 +997,7 @@ function buildLevels() {
         starIndex: 2,
       },
     ],
-    exit: { x: 1400, y: 40, w: 90, h: 40, label: "SALIDA" },
+    exit: { x: 1400, y: 40, w: 90, h: 40, label: "EXIT" },
     objectivesRequired: ["frag_its", "frag_prevencion", "frag_metodos", "frag_mitos", "frag_autocuidado"],
   };
 
@@ -1154,9 +1183,9 @@ const UI_TEXT = {
     mapTitle: "MAPA DE JOB QUEST",
     playingAs: "Jugando como",
     locked: "Bloqueado",
-    testMode: "MODO PRUEBA",
-    testModeText: "Acceso rápido para probar cualquier mapa sin completar los anteriores.",
     quickTooltip: "Cada mapa se desbloquea al completar todos sus desafíos y objetivos. Las respuestas incorrectas descuentan estrellas del resultado.",
+    instructions: "¿Cómo se juega?",
+    closeInstructions: "Entendido",
     labelCareerClues: "Career Clues",
     labelSignals: "Workplace Signals",
     labelCareerCenter: "Career Center",
@@ -1172,9 +1201,9 @@ const UI_TEXT = {
     mapTitle: "JOB QUEST MAP",
     playingAs: "Playing as",
     locked: "Locked",
-    testMode: "TEST MODE",
-    testModeText: "Quick access to test any map without completing the previous ones.",
     quickTooltip: "Each map unlocks after completing all of its challenges and objectives. Incorrect answers reduce the stars earned.",
+    instructions: "How to play",
+    closeInstructions: "Got it",
     labelCareerClues: "Career Clues",
     labelSignals: "Workplace Signals",
     labelCareerCenter: "Career Center",
@@ -1184,10 +1213,11 @@ const UI_TEXT = {
 };
 
 /* ---------- Pantalla de selección de personaje ---------- */
-function CharacterSelectScreen({ onSelect, language = "es" }) {
+function CharacterSelectScreen({ onSelect, language = "en" }) {
   const [hover, setHover] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState(CHARACTERS[0]);
   const [playerName, setPlayerName] = useState("");
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
 
   function startGame() {
     const name = playerName.trim();
@@ -1195,7 +1225,7 @@ function CharacterSelectScreen({ onSelect, language = "es" }) {
     onSelect({ ...selectedAvatar, name });
   }
 
-  const text = UI_TEXT[language] || UI_TEXT.es;
+  const text = UI_TEXT[language] || UI_TEXT.en;
 
   return (
     <div style={styles.centerScreen}>
@@ -1204,6 +1234,9 @@ function CharacterSelectScreen({ onSelect, language = "es" }) {
       <p style={{ color: "#C9CFEA", marginBottom: 28, fontFamily: "'Inter', sans-serif" }}>
         {text.introLine}
       </p>
+      <BigButton onClick={() => setInstructionsOpen(true)} color="#8DB4FF" style={{ marginBottom: 18 }}>
+        {text.instructions}
+      </BigButton>
       <PixelPanel style={{ padding: 28, maxWidth: 560 }}>
         <p style={{ marginTop: 0, marginBottom: 18, fontFamily: "'Inter', sans-serif" }}>
           {text.writeName}
@@ -1227,7 +1260,16 @@ function CharacterSelectScreen({ onSelect, language = "es" }) {
             fontSize: 15,
           }}
         />
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: 12,
+            width: "100%",
+            maxWidth: 430,
+            margin: "0 auto",
+          }}
+        >
           {CHARACTERS.map((c) => (
             <div
               key={c.id}
@@ -1236,7 +1278,7 @@ function CharacterSelectScreen({ onSelect, language = "es" }) {
               onMouseLeave={() => setHover(null)}
               style={{
                 cursor: "pointer",
-                width: 108,
+                width: "100%",
                 padding: "16px 8px",
                 borderRadius: 12,
                 background: hover === c.id ? c.color : "rgba(255,255,255,0.06)",
@@ -1267,13 +1309,55 @@ function CharacterSelectScreen({ onSelect, language = "es" }) {
           {text.startAs} {playerName.trim() || text.player}
         </BigButton>
       </PixelPanel>
+      {instructionsOpen && <InstructionsModal language={language} onClose={() => setInstructionsOpen(false)} />}
+    </div>
+  );
+}
+
+function InstructionsModal({ language, onClose }) {
+  const isSpanish = language !== "en";
+  const instructions = isSpanish
+    ? [
+        ["1. Elegí tu personaje", "Escribí tu nombre y seleccioná un avatar para comenzar."],
+        ["2. Explorá cada mapa", "Movete con WASD o las flechas. Acercate a los personajes y objetos y presioná E para interactuar."],
+        ["3. Resolvé los desafíos", "Hablá con los NPCs y revisá las pistas. Completá los desafíos requeridos para habilitar la salida."],
+        ["4. Avanzá por la ruta", "Los mapas se desbloquean en orden al completar el anterior. El mapa 4 es la misión final."],
+        ["5. Batalla de entrevistas", "En el mapa 4, movete con WASD o las flechas, apuntá con el mouse y dispará con clic izquierdo."],
+      ]
+    : [
+        ["1. Choose your character", "Enter your name and select an avatar to begin."],
+        ["2. Explore each map", "Move with WASD or the arrow keys. Approach characters and objects, then press E to interact."],
+        ["3. Complete the challenges", "Talk to NPCs and inspect clues. Finish the required challenges to open the exit."],
+        ["4. Progress through the route", "Maps unlock in order when you complete the previous one. Map 4 is the final mission."],
+        ["5. Interview battle", "In map 4, move with WASD or the arrow keys, aim with the mouse, and shoot with the left mouse button."],
+      ];
+  const text = UI_TEXT[language] || UI_TEXT.en;
+
+  return (
+    <div style={{ ...styles.modalOverlay, position: "fixed", zIndex: 100, padding: 16 }}>
+      <PixelPanel style={{ maxWidth: 560, width: "100%", maxHeight: "90vh", overflowY: "auto", padding: 24 }}>
+        <h2 style={{ marginTop: 0, color: "#C6F135", fontFamily: "'Baloo 2', sans-serif" }}>
+          {text.instructions}
+        </h2>
+        <div style={{ display: "grid", gap: 14 }}>
+          {instructions.map(([title, description]) => (
+            <div key={title}>
+              <strong style={{ color: "#8DB4FF" }}>{title}</strong>
+              <div style={{ color: "#C9CFEA", lineHeight: 1.5, marginTop: 3 }}>{description}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ textAlign: "right", marginTop: 20 }}>
+          <BigButton onClick={onClose}>{text.closeInstructions}</BigButton>
+        </div>
+      </PixelPanel>
     </div>
   );
 }
 
 /* ---------- Pantalla de mapa general ---------- */
-function MapScreen({ progress, onEnterLevel, character, language = "es" }) {
-  const text = UI_TEXT[language] || UI_TEXT.es;
+function MapScreen({ progress, onEnterLevel, character, language = "en" }) {
+  const text = UI_TEXT[language] || UI_TEXT.en;
   const nodes = [
     { id: "liceo", icon: "🏫", label: text.labelCareerClues },
     { id: "rumores", icon: "🗣️", label: text.labelSignals },
@@ -1328,10 +1412,11 @@ function MapScreen({ progress, onEnterLevel, character, language = "es" }) {
           );
         })}
       </div>
+      {/* Test-mode buttons are intentionally disabled. Remove this JSX comment to re-enable them.
       <PixelPanel style={{ marginTop: 26, padding: "14px 18px", borderColor: "#FFB347", textAlign: "center" }}>
-        <div style={{ color: "#FFB347", fontWeight: 700, marginBottom: 8 }}>{text.testMode}</div>
+        <div style={{ color: "#FFB347", fontWeight: 700, marginBottom: 8 }}>Test mode</div>
         <div style={{ color: "#C9CFEA", fontSize: 12, marginBottom: 10 }}>
-          {text.testModeText}
+          Skip map unlock requirements and open any map directly for testing.
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
           {nodes.map((n) => (
@@ -1341,11 +1426,12 @@ function MapScreen({ progress, onEnterLevel, character, language = "es" }) {
               color="#FFB347"
               style={{ fontSize: 13, padding: "7px 12px" }}
             >
-              {language === "es" ? "Probar" : "Test"} {n.label}
+              Test {n.label}
             </BigButton>
           ))}
         </div>
       </PixelPanel>
+      */}
       <p style={{ marginTop: 28, color: "#8891C4", fontFamily: "'Inter', sans-serif", fontSize: 13, maxWidth: 480, textAlign: "center" }}>
         {text.quickTooltip}
       </p>
@@ -1415,10 +1501,53 @@ function ModalShell({ title, children, accent = "#C6F135" }) {
 function DialogueModal({ npc, lineIndex, onNext }) {
   const line = npc.dialogue[lineIndex];
   const isLast = lineIndex >= npc.dialogue.length - 1;
+  const imageUrl = npcImageAsset(npc);
   return (
     <ModalShell accent={npc.color}>
       <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-        <div style={{ fontSize: 40 }}>{npc.emoji}</div>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt=""
+            style={{ width: 90, height: 90, flex: "0 0 90px", objectFit: "contain" }}
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            style={{
+              position: "relative",
+              width: 40,
+              height: 40,
+              flex: "0 0 40px",
+              borderRadius: "50%",
+              background: `${npc.color}33`,
+              border: `2px solid ${npc.color}`,
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: 6,
+                left: 13,
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: npc.color,
+              }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                bottom: 5,
+                left: 8,
+                width: 20,
+                height: 11,
+                borderRadius: "10px 10px 7px 7px",
+                background: npc.color,
+              }}
+            />
+          </div>
+        )}
         <div>
           <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, marginBottom: 6 }}>
             {npc.name}
@@ -1428,7 +1557,7 @@ function DialogueModal({ npc, lineIndex, onNext }) {
       </div>
       <div style={{ textAlign: "right", marginTop: 18 }}>
         <BigButton onClick={onNext} color={npc.color}>
-          {isLast ? "Continuar" : "Siguiente"}
+          {isLast ? "Continue" : "Next"}
         </BigButton>
       </div>
     </ModalShell>
@@ -1438,15 +1567,15 @@ function DialogueModal({ npc, lineIndex, onNext }) {
 /* ---------- Modal de desafío MITO/REALIDAD ---------- */
 function MitoModal({ data, onAnswer, feedback, onRetry, onClose }) {
   return (
-    <ModalShell title="¿MITO O REALIDAD?" accent="#FFD166">
+    <ModalShell title="MYTH OR FACT?" accent="#FFD166">
       <p style={{ fontFamily: "'Inter', sans-serif", lineHeight: 1.5 }}>{data.text}</p>
       {!feedback ? (
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 14 }}>
           <BigButton color="#FF4D8D" onClick={() => onAnswer("mito")}>
-            MITO
+            MYTH
           </BigButton>
           <BigButton color="#8DB4FF" onClick={() => onAnswer("realidad")}>
-            REALIDAD
+            FACT
           </BigButton>
         </div>
       ) : (
@@ -1459,15 +1588,15 @@ function MitoModal({ data, onAnswer, feedback, onRetry, onClose }) {
 /* ---------- Modal Verdadero/Falso ---------- */
 function TrueFalseModal({ data, onAnswer, feedback, onRetry, onClose }) {
   return (
-    <ModalShell title="VERDADERO O FALSO" accent="#8DB4FF">
+    <ModalShell title="TRUE OR FALSE" accent="#8DB4FF">
       <p style={{ fontFamily: "'Inter', sans-serif", lineHeight: 1.5 }}>{data.text}</p>
       {!feedback ? (
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 14 }}>
           <BigButton color="#8DB4FF" onClick={() => onAnswer(true)}>
-            VERDADERO
+            TRUE
           </BigButton>
           <BigButton color="#FF4D8D" onClick={() => onAnswer(false)}>
-            FALSO
+            FALSE
           </BigButton>
         </div>
       ) : (
@@ -1480,7 +1609,7 @@ function TrueFalseModal({ data, onAnswer, feedback, onRetry, onClose }) {
 /* ---------- Modal Opción múltiple ---------- */
 function MCModal({ data, onAnswer, feedback, onRetry, onClose }) {
   return (
-    <ModalShell title="RESPONDÉ" accent="#C6F135">
+    <ModalShell title="YOUR ANSWER" accent="#C6F135">
       <p style={{ fontFamily: "'Inter', sans-serif", lineHeight: 1.5 }}>{data.text}</p>
       {!feedback ? (
         <div style={{
@@ -1531,15 +1660,15 @@ function FeedbackBlock({ feedback, onRetry, onClose }) {
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <strong>{ok ? "¡Correcto!" : "Revisá esta idea."}</strong>
+        <strong>{ok ? "Excellent!" : "Take another look."}</strong>
         <div style={{ marginTop: 6, lineHeight: 1.5 }}>{feedback.explanation}</div>
       </div>
       <div style={{ textAlign: "right", marginTop: 14 }}>
         {ok ? (
-          <BigButton onClick={onClose}>Continuar</BigButton>
+          <BigButton onClick={onClose}>Continue</BigButton>
         ) : (
           <BigButton color="#8DB4FF" onClick={onRetry}>
-            Intentar de nuevo
+            Try again
           </BigButton>
         )}
       </div>
@@ -1550,18 +1679,18 @@ function FeedbackBlock({ feedback, onRetry, onClose }) {
 /* ---------- Modal ficha informativa (ITS) ---------- */
 function InfoCardModal({ data, onClose }) {
   return (
-    <ModalShell title={`FICHA · ${data.name}`} accent="#8DB4FF">
+    <ModalShell title={`INFO CARD · ${data.name}`} accent="#8DB4FF">
       <div style={{ fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
         <p>
-          <strong>Transmisión:</strong> {data.transmission}
+          <strong>Transmission:</strong> {data.transmission}
         </p>
         <p>
-          <strong>Prevención:</strong> {data.prevention}
+          <strong>Prevention:</strong> {data.prevention}
         </p>
         <p style={{ color: "#C9CFEA" }}>{data.note}</p>
       </div>
       <div style={{ textAlign: "right", marginTop: 10 }}>
-        <BigButton onClick={onClose}>Cerrar</BigButton>
+        <BigButton onClick={onClose}>Close</BigButton>
       </div>
     </ModalShell>
   );
@@ -1624,7 +1753,7 @@ function EditableChallengeModal({ questions, title, presentation = "multiple", o
       correct,
       explanation: correct
         ? question.correctExplanation || question.explanation
-        : question.retryExplanation || "No es la respuesta correcta. ¡Volvé a intentarlo!",
+        : question.retryExplanation || "That is not the correct answer. Try again!",
     });
   };
   const checkSelectedAnswers = () => {
@@ -1636,7 +1765,7 @@ function EditableChallengeModal({ questions, title, presentation = "multiple", o
       correct: isCorrect,
       explanation: isCorrect
         ? question.correctExplanation || question.explanation
-        : question.retryExplanation || "No es la respuesta correcta. ¡Volvé a intentarlo!",
+        : question.retryExplanation || "That is not the correct answer. Try again!",
     });
   };
 
@@ -1866,7 +1995,7 @@ function DragDropModal({ onFinish, onIncorrectAnswer }) {
               Reintentar
             </BigButton>
           )}
-          {allCorrect && <BigButton onClick={onFinish}>¡Listo! Continuar</BigButton>}
+          {allCorrect && <BigButton onClick={onFinish}>Done! Continue</BigButton>}
         </div>
       </PixelPanel>
     </div>
@@ -1921,11 +2050,11 @@ function PauseMenu({ onResume, onMap }) {
   return (
     <div style={styles.modalOverlay}>
       <PixelPanel style={{ padding: 28, width: 300, textAlign: "center" }}>
-        <h3 style={{ fontFamily: "'Baloo 2', sans-serif", marginTop: 0 }}>PAUSA</h3>
+        <h3 style={{ fontFamily: "'Baloo 2', sans-serif", marginTop: 0 }}>PAUSED</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 18 }}>
-          <BigButton onClick={onResume}>Continuar</BigButton>
+          <BigButton onClick={onResume}>Resume</BigButton>
           <BigButton color="#8DB4FF" onClick={onMap}>
-            Volver al mapa
+            Back to map
           </BigButton>
         </div>
       </PixelPanel>
@@ -1938,10 +2067,10 @@ function InventoryPanel({ items, onClose }) {
   return (
     <div style={styles.modalOverlay}>
       <PixelPanel style={{ padding: 22, width: 360, maxHeight: "70vh", overflowY: "auto" }}>
-        <h3 style={{ fontFamily: "'Baloo 2', sans-serif", marginTop: 0 }}>🎒 INVENTARIO</h3>
+        <h3 style={{ fontFamily: "'Baloo 2', sans-serif", marginTop: 0 }}>🎒 INVENTORY</h3>
         {items.length === 0 && (
           <p style={{ color: "#8891C4", fontFamily: "'Inter', sans-serif" }}>
-            Todavía no encontraste objetos. ¡Seguí explorando!
+            You have not found any items yet. Keep exploring!
           </p>
         )}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1962,7 +2091,7 @@ function InventoryPanel({ items, onClose }) {
           ))}
         </div>
         <div style={{ textAlign: "right", marginTop: 16 }}>
-          <BigButton onClick={onClose}>Cerrar</BigButton>
+          <BigButton onClick={onClose}>Close</BigButton>
         </div>
       </PixelPanel>
     </div>
@@ -1975,17 +2104,17 @@ function LevelCompleteScreen({ levelName, stars, onContinue, justUnlocked }) {
     <div style={styles.centerScreen}>
       <PixelPanel style={{ padding: 32, textAlign: "center", maxWidth: 420 }}>
         <div style={{ fontSize: 44 }}>🏁</div>
-        <h2 style={{ fontFamily: "'Baloo 2', sans-serif", margin: "8px 0" }}>¡NIVEL COMPLETADO!</h2>
+        <h2 style={{ fontFamily: "'Baloo 2', sans-serif", margin: "8px 0" }}>LEVEL COMPLETED!</h2>
         <p style={{ color: "#C9CFEA", fontFamily: "'Inter', sans-serif" }}>{levelName}</p>
         <div style={{ margin: "18px 0" }}>
           <StarRow count={stars} size={40} />
         </div>
         {justUnlocked && (
           <p style={{ color: "#C6F135", fontFamily: "'Inter', sans-serif", fontSize: 13 }}>
-            🔓 ¡Se desbloqueó "{justUnlocked}"!
+            🔓 "{justUnlocked}" is unlocked!
           </p>
         )}
-        <BigButton onClick={onContinue}>Volver al mapa</BigButton>
+        <BigButton onClick={onContinue}>Back to map</BigButton>
       </PixelPanel>
     </div>
   );
@@ -2034,6 +2163,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
   const [entityTool, setEntityTool] = useState("select");
   const [entityDraft, setEntityDraft] = useState(null);
   const [entityEditorError, setEntityEditorError] = useState("");
+  const [entityImageUploading, setEntityImageUploading] = useState(false);
   const [challengeDraft, setChallengeDraft] = useState(null);
   const toastTimer = useRef(null);
   const initialGuideDialogShown = useRef(false);
@@ -2101,21 +2231,24 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           !editorContent.removedChallengeIds.includes(key);
       })
       .map((object) => object.id);
+    const objectivesRequired = levelConfig.id === "centro"
+      ? challengeObjectObjectives
+      : [
+          ...(levelConfig.objectivesRequired || []).filter((id) =>
+            !editorContent.removedObjectIds.includes(id) && !editorContent.removedNpcIds.includes(id)
+          ),
+          ...editableNpcs.map((npc) => npc.id),
+          ...editableObjects.map((object) => object.id),
+          ...challengeNpcObjectives,
+          ...challengeObjectObjectives,
+        ];
     return {
       ...levelConfig,
       npcs: allNpcs,
       objects: allObjects,
       exit: editorContent.exit || levelConfig.exit,
       customObjectives: true,
-      objectivesRequired: [...new Set([
-        ...(levelConfig.objectivesRequired || []).filter((id) =>
-          !editorContent.removedObjectIds.includes(id) && !editorContent.removedNpcIds.includes(id)
-        ),
-        ...editableNpcs.map((npc) => npc.id),
-        ...editableObjects.map((object) => object.id),
-        ...challengeNpcObjectives,
-        ...challengeObjectObjectives,
-      ])],
+      objectivesRequired: [...new Set(objectivesRequired)],
     };
   }, [levelConfig, editorContent]);
 
@@ -2199,7 +2332,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     if (!runtimeRef.current.stars[idx]) {
       runtimeRef.current.stars[idx] = true;
       playSound("star");
-      showToast(`⭐ ¡Estrella ${idx} conseguida!`);
+      showToast(`⭐ Star ${idx} earned!`);
     }
   }
 
@@ -2208,9 +2341,9 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     runtimeRef.current.incorrectAnswers = mistakes;
     forceTick((tick) => tick + 1);
     if (mistakes === 1) {
-      showToast("Una respuesta incorrecta: se descontará 1 estrella del resultado.");
+      showToast("One incorrect answer: 1 star will be deducted from your score.");
     } else if (mistakes === 6) {
-      showToast("Seis respuestas incorrectas: se descontarán 2 estrellas del resultado.");
+      showToast("Six incorrect answers: 2 stars will be deducted from your score.");
     }
   }
 
@@ -2224,7 +2357,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
 
   function checkExit() {
     if (!areLevelObjectivesComplete(editableLevelConfig, runtimeRef.current)) {
-      showToast("Todavía hay cosas por resolver en este nivel 🔎");
+      showToast("There are still things to complete in this level 🔎");
       return;
     }
     markStar(1);
@@ -2277,7 +2410,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         });
       } catch {
         throw new Error(
-          "No hay conexión con el servidor que guarda el proyecto. Ejecutá `npm run dev` en la carpeta del proyecto, dejalo abierto y volvé a pulsar Guardar. El cambio sigue en el editor."
+          "Could not connect to the project save server. Run `npm run dev` in the project folder, leave it running, and click Save again. Your changes are still in the editor."
         );
       }
       if (!response.ok) {
@@ -2294,11 +2427,11 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
 
   async function closeEditor(editor) {
     if (editor === "entities" && entityDraft) {
-      setEntityEditorError("Guardá o cancelá el elemento que estás editando antes de cerrar el lápiz.");
+      setEntityEditorError("Save or cancel the element you are editing before closing the editor.");
       return;
     }
     if (editor === "entities" && challengeDraft) {
-      setEntityEditorError("Guardá o cancelá el desafío que estás editando antes de cerrar el lápiz.");
+      setEntityEditorError("Save or cancel the challenge you are editing before closing the editor.");
       return;
     }
     setProjectSaveStatus("Guardando en el proyecto...");
@@ -2322,7 +2455,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     setEntityDraft(null);
     setChallengeDraft(null);
     setEntityEditorError("");
-    showToast(type === "exit" ? "Hacé clic sobre el cartel EXIT para ubicar la salida." : "Hacé clic en el mapa para colocar el elemento.");
+    showToast(type === "exit" ? "Click the EXIT sign to position the map exit." : "Click the map to place the element.");
   }
 
   function startEntityEdit(type, item) {
@@ -2335,9 +2468,10 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       objectType: item.type,
       x: item.x,
       y: item.y,
+      ...(type === "npc" ? { imageUrl: item.imageUrl || "", imagePreview: "" } : {}),
       name: type === "npc" ? item.name : "",
       label: type === "npc" ? "" : item.label || item.name || item.id,
-      emoji: item.emoji || (type === "npc" ? "🧑‍💼" : "📌"),
+      ...(type === "npc" ? {} : { emoji: item.emoji || "📌" }),
       color: item.color,
       gender: item.gender || "neutral",
       skin: item.skin,
@@ -2371,9 +2505,10 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       type: entityTool,
       x: position.x,
       y: position.y,
+      ...(entityTool === "npc" ? { imageUrl: "", imagePreview: "" } : {}),
       name: "",
       label: "",
-      emoji: entityTool === "npc" ? "🧑‍💼" : "📌",
+      ...(entityTool === "npc" ? {} : { emoji: "📌" }),
       color: "#FFB347",
       gender: "neutral",
       skin: "#F6C9A7",
@@ -2386,6 +2521,36 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     setEntityEditorError("");
   }
 
+  async function handleNpcImageChange(event) {
+    const file = event.target.files?.[0];
+    if (!file || !entityDraft || entityDraft.type !== "npc") return;
+
+    const draftId = entityDraft.id;
+    setEntityImageUploading(true);
+    setEntityEditorError("");
+    try {
+      const image = await prepareNpcImage(file);
+      const response = await fetch("/__job-quest/npc-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: draftId, image }),
+      });
+      if (!response.ok) {
+        const detail = await response.text();
+        throw new Error(detail || `El servidor respondió ${response.status}.`);
+      }
+      const result = await response.json();
+      setEntityDraft((current) => current?.id === draftId
+        ? { ...current, imageUrl: result.imageUrl, imagePreview: image }
+        : current);
+    } catch (error) {
+      setEntityEditorError(`No se pudo guardar la foto del NPC: ${error.message}`);
+    } finally {
+      setEntityImageUploading(false);
+      event.target.value = "";
+    }
+  }
+
   async function saveEntityDraft(event) {
     event.preventDefault();
     if (!entityDraft) return;
@@ -2394,7 +2559,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     const needsContent = entityDraft.type === "npc" ||
       entityDraft.objectType === "pista" || entityDraft.objectType === "mito";
     if (!title || (needsContent && !content)) {
-      setEntityEditorError("Completá el nombre o título y el contenido requerido antes de guardar.");
+      setEntityEditorError("Enter a name or title and the required content before saving.");
       return;
     }
     const entry = entityDraft.type === "npc"
@@ -2403,7 +2568,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           x: entityDraft.x,
           y: entityDraft.y,
           name: title,
-          emoji: entityDraft.emoji || "🧑‍💼",
+          imageUrl: entityDraft.imageUrl || null,
           color: entityDraft.color || "#FFB347",
           gender: entityDraft.gender || "neutral",
           skin: entityDraft.skin || "#F6C9A7",
@@ -2615,14 +2780,14 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       kind,
       entityId: item.id,
       assignedNpcId: kind === "npc" ? item.id : "",
-      title: kind === "npc" ? `Desafío de ${item.name}` : item.label || "Desafío",
+      title: kind === "npc" ? `Challenge for ${item.name}` : item.label || "Challenge",
       presentation: saved?.presentation || "multiple",
       questions: questions.length
         ? questions.map((question) => ({
           ...question,
           options: [...question.options],
           correctExplanation: question.correctExplanation || question.explanation || "",
-          retryExplanation: question.retryExplanation || "No es la respuesta correcta. ¡Volvé a intentarlo!",
+          retryExplanation: question.retryExplanation || "That is not the correct answer. Try again!",
           multiSelect: question.multiSelect || (question.correctIndexes?.length || 0) > 1,
           correctIndexes: question.correctIndexes?.length
             ? [...question.correctIndexes]
@@ -2670,11 +2835,11 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       new Set(question.correctIndexes).size !== question.correctIndexes.length ||
       (!question.multiSelect && question.correctIndexes.length !== 1)
     )) {
-      setEntityEditorError("Completá cada consigna, sus opciones, una respuesta correcta y los dos mensajes de devolución.");
+      setEntityEditorError("Complete each question, its options, one correct answer, and both feedback messages.");
       return;
     }
     if (challengeDraft.kind === "npc" && !challengeDraft.assignedNpcId) {
-      setEntityEditorError("Elegí el NPC al que se le asignará este desafío.");
+      setEntityEditorError("Choose the NPC this challenge will be assigned to.");
       return;
     }
     const nextOverrides = { ...editorContent.challengeOverrides };
@@ -2756,7 +2921,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     }
     setChallengeDraft(null);
     setEntityEditorError("");
-    showToast("Desafío guardado en src/editorData.json.");
+    showToast("Challenge saved to src/editorData.json.");
   }
 
   function deleteNpcChallenge(npc) {
@@ -2841,7 +3006,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         const challengeKey = `myth:${obj.dataId}`;
         if (editorContent.removedChallengeIds.includes(challengeKey)) {
           runtimeRef.current.doneObjects[obj.id] = true;
-          showToast("Cartel revisado; no tiene un desafío asignado.");
+          showToast("Poster checked; no challenge is assigned to it.");
           forceTick((t) => t + 1);
           break;
         }
@@ -2886,7 +3051,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         runtimeRef.current.doneObjects[obj.id] = true;
         collectInventoryItem({ emoji: BONUS_FRAGMENT.emoji, label: BONUS_FRAGMENT.label, text: BONUS_FRAGMENT.text });
         playSound("pickup");
-        showToast("✨ ¡Encontraste algo extra!");
+        showToast("✨ You found a bonus item!");
         if (obj.starIndex) markStar(obj.starIndex);
         forceTick((t) => t + 1);
         break;
@@ -2907,8 +3072,8 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         const challengeKey = `mission:${obj.missionId}`;
         if (editorContent.removedChallengeIds.includes(challengeKey)) {
           runtimeRef.current.doneObjects[obj.id] = true;
-          collectInventoryItem({ emoji: mission.emoji, label: mission.label, text: "Fragmento conseguido." });
-          showToast(`${mission.emoji} Fragmento "${mission.label}" conseguido`);
+          collectInventoryItem({ emoji: mission.emoji, label: mission.label, text: "Fragment collected." });
+          showToast(`${mission.emoji} Fragment "${mission.label}" collected`);
           playSound("pickup");
           forceTick((t) => t + 1);
           break;
@@ -2937,7 +3102,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
     const ch = npc.challenge;
     const savedChallenge = editorContent.challengeOverrides[`npc:${npc.id}`];
     if (ch?.requires?.some((id) => !runtimeRef.current.doneObjects[id])) {
-      showToast("Primero revisá todos los elementos requeridos para este desafío.");
+      showToast("Check all the required items before starting this challenge.");
       return;
     }
     const savedQuestions = savedChallenge?.questions;
@@ -3019,13 +3184,13 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           style={{ fontSize: 12, padding: "6px 10px" }}
           disabled={!projectDataReady || !!projectDataError || !!projectSaveStatus}
         >
-          {!projectDataReady ? "Cargando editor..." : editorMode ? "Guardar y cerrar muros" : "✏ Editar muros"}
+          {!projectDataReady ? "Loading editor..." : editorMode ? "Save and close walls" : "✏ Edit walls"}
         </BigButton>
         {editorMode && (
           <PixelPanel style={{ marginTop: 8, padding: 10, width: 235, borderColor: "#FFB347", fontSize: 11 }}>
-            Arrastrá para dibujar un muro. Clic derecho para borrarlo; usá WASD para recorrer el mapa sin mover al personaje.
+            Drag to draw a wall. Right-click to erase it; use WASD to move around the map without moving the character.
             <br />
-            Al cerrar, los muros quedan guardados en src/editorData.json dentro del proyecto.
+            When you close the editor, walls are saved to src/editorData.json in the project.
             {projectDataError && <p role="alert" style={{ color: "#FF8FB1" }}>{projectDataError}</p>}
             {projectSaveStatus && <p role="status" style={{ color: "#C6F135" }}>{projectSaveStatus}</p>}
             <button
@@ -3053,7 +3218,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
             style={{ fontSize: 12, padding: "6px 10px" }}
             disabled={!projectDataReady || !!projectDataError || !!projectSaveStatus}
           >
-            {!projectDataReady ? "Cargando editor..." : entityEditorMode ? "Guardar y cerrar lápiz" : "✏ NPC y pistas"}
+            {!projectDataReady ? "Loading editor..." : entityEditorMode ? "Save and close editor" : "✏ NPCs and clues"}
           </BigButton>
           {entityEditorMode && (
             entityEditorMinimized ? (
@@ -3062,29 +3227,29 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                 onClick={() => setEntityEditorMinimized(false)}
                 style={{ marginTop: 8, padding: "7px 10px", borderRadius: 6, border: "1px solid #C6F135", background: "#151B40", color: "#F5F5F5", cursor: "pointer" }}
               >
-                Mostrar editor NPC y pistas
+                Show NPC and clue editor
               </button>
             ) : (
             <PixelPanel style={{ marginTop: 8, padding: 12, width: 300, maxHeight: 560, overflowY: "auto", borderColor: "#C6F135", fontSize: 12 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <strong>Editar escenario</strong>
+              <strong>Edit map</strong>
               <button
                 type="button"
                 onClick={() => setEntityEditorMinimized(true)}
-                aria-label="Minimizar editor NPC y pistas"
-                title="Minimizar para despejar el mapa"
+                aria-label="Minimize NPC and clue editor"
+                title="Minimize to clear the map"
                 style={{ padding: "3px 8px", borderRadius: 6, border: "1px solid #3A4270", background: "#151B40", color: "#F5F5F5", cursor: "pointer" }}
               >
-                − Minimizar
+                − Minimize
               </button>
               </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                 {[
                   ["select", "↖ Mover/editar"],
                   ["npc", "👤 NPC"],
-                  ["pista", "📌 Pista"],
-                  ["exit", "🚪 Salida"],
-                  ["borrar", "⌫ Borrar"],
+                  ["pista", "📌 Clue"],
+                  ["exit", "🚪 Exit"],
+                  ["borrar", "⌫ Delete"],
                 ].map(([tool, label]) => (
                   <button
                     key={tool}
@@ -3104,13 +3269,13 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                 ))}
               </div>
               <p style={{ color: "#C9CFEA", margin: "8px 0" }}>
-                Elegí “Mover/editar” y arrastrá elementos existentes. Un clic sobre ellos permite editar; usá WASD para recorrer el mapa sin mover al personaje.
+                Choose “Move/edit” and drag existing elements. Click an element to edit it; use WASD to move around the map without moving the character.
               </p>
               {entityDraft && (
                 <form onSubmit={saveEntityDraft} style={{ display: "grid", gap: 7, marginTop: 10 }}>
-                  <strong>{entityDraft.original ? "Editar elemento existente" : "Nuevo elemento"}</strong>
+                  <strong>{entityDraft.original ? "Edit existing element" : "New element"}</strong>
                   <label>
-                    {entityDraft.type === "npc" ? "Nombre" : "Título"}
+                    {entityDraft.type === "npc" ? "Name" : "Title"}
                     <input
                       value={entityDraft.type === "npc" ? entityDraft.name : entityDraft.label}
                       onChange={(event) => setEntityDraft({
@@ -3122,20 +3287,57 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                       style={editorInputStyle}
                     />
                   </label>
-                  <label>
-                    {entityDraft.type === "npc" ? "Ícono del NPC (opcional)" : "Emoji"}
-                    <input
-                      value={entityDraft.emoji}
-                      onChange={(event) => setEntityDraft({ ...entityDraft, emoji: event.target.value })}
-                      maxLength={8}
-                      style={editorInputStyle}
-                    />
-                  </label>
+                  {entityDraft.type !== "npc" && (
+                    <label>
+                      Emoji
+                      <input
+                        value={entityDraft.emoji}
+                        onChange={(event) => setEntityDraft({ ...entityDraft, emoji: event.target.value })}
+                        maxLength={8}
+                        style={editorInputStyle}
+                      />
+                    </label>
+                  )}
                   {entityDraft.type === "npc" && (
                     <>
-                      <strong style={{ marginTop: 3 }}>Apariencia del personaje</strong>
                       <label>
-                        Presentación
+                        NPC image (optional)
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={handleNpcImageChange}
+                          disabled={entityImageUploading}
+                          style={{ ...editorInputStyle, padding: 7 }}
+                        />
+                      </label>
+                      <span style={{ color: "#C9CFEA", fontSize: 12 }}>
+                        PNG, JPG, or WebP. Saved without quality loss (up to 1024 px).
+                      </span>
+                      {(entityDraft.imagePreview || entityDraft.imageUrl) && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <img
+                            src={entityDraft.imagePreview || npcImageAsset(entityDraft)}
+                            alt="NPC preview"
+                            style={{
+                              width: 64,
+                              height: 64,
+                              objectFit: "cover",
+                              borderRadius: "50%",
+                              border: "2px solid #8DB4FF",
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setEntityDraft({ ...entityDraft, imageUrl: "", imagePreview: "" })}
+                            style={editorActionButtonStyle}
+                          >
+                            Remove image
+                          </button>
+                        </div>
+                      )}
+                      <strong style={{ marginTop: 3 }}>Character appearance</strong>
+                      <label>
+                        Presentation
                         <select
                           value={entityDraft.gender || "neutral"}
                           onChange={(event) => setEntityDraft({
@@ -3145,56 +3347,56 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                           })}
                           style={editorInputStyle}
                         >
-                          <option value="female">Femenina</option>
-                          <option value="male">Masculina</option>
-                          <option value="neutral">Neutra</option>
+                          <option value="female">Feminine</option>
+                          <option value="male">Masculine</option>
+                          <option value="neutral">Neutral</option>
                         </select>
                       </label>
                       <label>
-                        Tono de piel
+                        Skin tone
                         <input
                           type="color"
                           value={entityDraft.skin || "#F6C9A7"}
                           onChange={(event) => setEntityDraft({ ...entityDraft, skin: event.target.value })}
-                          aria-label="Elegir tono de piel del NPC"
+                          aria-label="Choose NPC skin tone"
                           style={{ ...editorInputStyle, height: 34, padding: 3 }}
                         />
                       </label>
                       <label>
-                        Cabello
+                        Hairstyle
                         <select
                           value={entityDraft.hairStyle || "short"}
                           onChange={(event) => setEntityDraft({ ...entityDraft, hairStyle: event.target.value })}
                           style={editorInputStyle}
                         >
-                          <option value="short">Corto</option>
-                          <option value="long">Largo</option>
+                          <option value="short">Short</option>
+                          <option value="long">Long</option>
                         </select>
                       </label>
                       <label>
-                        Color de cabello
+                        Hair color
                         <input
                           type="color"
                           value={entityDraft.hair || "#342B35"}
                           onChange={(event) => setEntityDraft({ ...entityDraft, hair: event.target.value })}
-                          aria-label="Elegir color de cabello del NPC"
+                          aria-label="Choose NPC hair color"
                           style={{ ...editorInputStyle, height: 34, padding: 3 }}
                         />
                       </label>
                       <label>
-                        Color de ropa
+                        Clothing color
                         <input
                           type="color"
                           value={entityDraft.color || "#FFB347"}
                           onChange={(event) => setEntityDraft({ ...entityDraft, color: event.target.value })}
-                          aria-label="Elegir color de ropa del NPC"
+                          aria-label="Choose NPC clothing color"
                           style={{ ...editorInputStyle, height: 34, padding: 3 }}
                         />
                       </label>
                     </>
                   )}
                   <label>
-                    {entityDraft.type === "npc" ? "Diálogo (una línea por mensaje)" : "Texto del cartel o pista"}
+                    {entityDraft.type === "npc" ? "Dialogue (one line per message)" : "Poster or clue text"}
                     <textarea
                       value={entityDraft.content}
                       onChange={(event) => setEntityDraft({ ...entityDraft, content: event.target.value })}
@@ -3205,14 +3407,16 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                     />
                   </label>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button type="submit" style={editorActionButtonStyle}>Guardar</button>
-                    <button type="button" onClick={() => setEntityDraft(null)} style={editorActionButtonStyle}>Cancelar</button>
+                    <button type="submit" disabled={entityImageUploading} style={editorActionButtonStyle}>
+                      {entityImageUploading ? "Saving image..." : "Save"}
+                    </button>
+                    <button type="button" onClick={() => setEntityDraft(null)} style={editorActionButtonStyle}>Cancel</button>
                   </div>
                 </form>
               )}
               {challengeDraft && (
                 <form onSubmit={saveChallengeDraft} style={{ display: "grid", gap: 8, marginTop: 12, borderTop: "1px solid #3A4270", paddingTop: 10 }}>
-                  <strong>Editar / crear desafío</strong>
+                  <strong>Edit / create challenge</strong>
                   <label>
                     Título
                     <input
@@ -3224,23 +3428,23 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                     />
                   </label>
                   <label>
-                    Formato del desafío
+                    Challenge format
                     <select
                       value={challengeDraft.presentation}
                       onChange={(event) => setChallengeDraft({ ...challengeDraft, presentation: event.target.value })}
                       style={editorInputStyle}
                     >
-                      <option value="multiple">Opción múltiple</option>
+                      <option value="multiple">Multiple choice</option>
                       <option value="cards">Tarjetas de respuesta</option>
                     </select>
                   </label>
                   <p style={{ color: "#C9CFEA", margin: "-3px 0 2px", fontSize: 11 }}>
                     {challengeDraft.presentation === "cards"
-                      ? "Las opciones se mostrarán como tarjetas grandes. Escribí cada tarjeta y marcá la correcta con su círculo."
-                      : "Escribí las opciones y marcá con el círculo la respuesta correcta."}
+                      ? "Options will appear as large cards. Enter each card and mark the correct one with its circle."
+                      : "Enter the options and mark the correct answer with its circle."}
                   </p>
                   <label>
-                    {challengeDraft.kind === "npc" ? "Asignar desafío a NPC" : "Asignar este desafío a un NPC (opcional)"}
+                    {challengeDraft.kind === "npc" ? "Assign challenge to NPC" : "Assign this challenge to an NPC (optional)"}
                     <select
                       value={challengeDraft.assignedNpcId}
                       onChange={(event) => setChallengeDraft({ ...challengeDraft, assignedNpcId: event.target.value })}
@@ -3249,8 +3453,8 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                       {challengeDraft.kind !== "npc" && (
                         <option value="">
                           {challengeDraft.entityId && editableLevelConfig.objects.find((item) => item.id === challengeDraft.entityId)?.type === "pista"
-                            ? "Dejar el desafío en la pista"
-                            : "Dejar el desafío en el cartel / fragmento"}
+                            ? "Keep the challenge on the clue"
+                            : "Keep the challenge on the poster / fragment"}
                         </option>
                       )}
                       {editableLevelConfig.npcs.map((npc) => (
@@ -3296,8 +3500,8 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                       />
                       <p style={{ color: "#C9CFEA", margin: 0, fontSize: 11 }}>
                         {challengeDraft.presentation === "cards"
-                          ? "Contenido de las tarjetas (elegí una como correcta):"
-                          : "Opciones de respuesta (elegí una como correcta):"}
+                          ? "Card content (choose one as correct):"
+                          : "Answer options (choose one as correct):"}
                       </p>
                       {question.options.map((option, optionIndex) => (
                         <div key={optionIndex} style={{ display: "flex", gap: 5, alignItems: "center" }}>
@@ -3324,7 +3528,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                                 correctIndex: correctIndexes[0] ?? 0,
                               });
                             }}
-                            aria-label={`Marcar ${challengeDraft.presentation === "cards" ? "tarjeta" : "opción"} ${optionIndex + 1} como respuesta correcta`}
+                            aria-label={`Mark ${challengeDraft.presentation === "cards" ? "card" : "option"} ${optionIndex + 1} as the correct answer`}
                           />
                           <input
                             value={option}
@@ -3334,7 +3538,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                             maxLength={240}
                             required
                             aria-label={`Opción ${optionIndex + 1}`}
-                            placeholder={`${challengeDraft.presentation === "cards" ? "Tarjeta" : "Opción"} ${optionIndex + 1}`}
+                            placeholder={`${challengeDraft.presentation === "cards" ? "Card" : "Option"} ${optionIndex + 1}`}
                             style={{ ...editorInputStyle, flex: 1 }}
                           />
                           {question.options.length > 2 && (
@@ -3366,18 +3570,18 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                         onClick={() => updateChallengeQuestion(questionIndex, { options: [...question.options, ""] })}
                         style={editorActionButtonStyle}
                       >
-                        {challengeDraft.presentation === "cards" ? "Agregar tarjeta" : "Agregar opción"}
+                        {challengeDraft.presentation === "cards" ? "Add card" : "Add option"}
                       </button>}
                       <label>
-                        Explicación si responde correctamente
+                        Explanation when answered correctly
                         <textarea
-                          aria-label={`Explicación de respuesta correcta ${questionIndex + 1}`}
+                          aria-label={`Explanation for correct answer ${questionIndex + 1}`}
                           value={question.correctExplanation}
                           onChange={(event) => updateChallengeQuestion(questionIndex, { correctExplanation: event.target.value })}
                           maxLength={600}
                           rows={2}
                           required
-                          placeholder="Explicá por qué la respuesta es correcta"
+                          placeholder="Explain why the answer is correct"
                           style={{ ...editorInputStyle, resize: "vertical" }}
                         />
                       </label>
@@ -3390,7 +3594,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                           maxLength={600}
                           rows={2}
                           required
-                          placeholder="Dale una pista o animá a intentarlo de nuevo"
+                          placeholder="Give a hint or encourage the player to try again"
                           style={{ ...editorInputStyle, resize: "vertical" }}
                         />
                       </label>
@@ -3403,7 +3607,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                           })}
                           style={editorActionButtonStyle}
                         >
-                          Eliminar pregunta
+                          Delete question
                         </button>
                       )}
                     </div>
@@ -3424,12 +3628,12 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                     })}
                     style={editorActionButtonStyle}
                   >
-                    Agregar pregunta
+                    Add question
                   </button>}
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button type="submit" style={editorActionButtonStyle}>Guardar desafío</button>
+                    <button type="submit" style={editorActionButtonStyle}>Save challenge</button>
                     <button type="button" onClick={deleteCurrentChallenge} style={editorActionButtonStyle}>
-                      Eliminar desafío
+                      Delete challenge
                     </button>
                     <button type="button" onClick={() => setChallengeDraft(null)} style={editorActionButtonStyle}>Cancelar</button>
                   </div>
@@ -3447,10 +3651,10 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
                   <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.emoji} {type === "npc" ? item.name : item.label}</span>
                   <button type="button" onClick={() => startEntityEdit(type, item)} style={editorActionButtonStyle}>Editar</button>
                   {type === "npc" && (
-                    <button type="button" onClick={() => openChallengeEditor(type, item)} style={editorActionButtonStyle}>Desafío</button>
+                    <button type="button" onClick={() => openChallengeEditor(type, item)} style={editorActionButtonStyle}>Challenge</button>
                   )}
                   {type === "pista" && ["mito", "fragment", "pista"].includes(item.type) && (
-                    <button type="button" onClick={() => openChallengeEditor(type, item)} style={editorActionButtonStyle}>Desafío</button>
+                    <button type="button" onClick={() => openChallengeEditor(type, item)} style={editorActionButtonStyle}>Challenge</button>
                   )}
                   <button type="button" onClick={() => removeEntity(type, item.id)} style={editorActionButtonStyle}>×</button>
                 </div>
@@ -3738,6 +3942,7 @@ function GameCanvas({
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const backgroundImage = levelConfig.backgroundImage ? new Image() : null;
+    const npcImages = new Map();
     if (backgroundImage) backgroundImage.src = levelConfig.backgroundImage;
     let raf;
     let lastTime = performance.now();
@@ -3768,7 +3973,7 @@ function GameCanvas({
         w: ex.w,
         h: ex.h,
         data: ex,
-        label: exitReady ? "SALIR / ENTREGAR" : "SALIDA BLOQUEADA",
+        label: exitReady ? "EXIT / SUBMIT" : "EXIT LOCKED",
       });
       return list;
     }
@@ -3904,7 +4109,14 @@ function GameCanvas({
 
       // NPCs
       levelConfig.npcs.forEach((npc) => {
-        drawNpc(ctx, npc);
+        const imageUrl = npcImageAsset(npc);
+        let image = imageUrl ? npcImages.get(imageUrl) : null;
+        if (imageUrl && !image) {
+          image = new Image();
+          image.src = imageUrl;
+          npcImages.set(imageUrl, image);
+        }
+        drawNpc(ctx, npc, image);
       });
 
       // salida
@@ -3917,7 +4129,7 @@ function GameCanvas({
       ctx.strokeRect(ex.x, ex.y, ex.w, ex.h);
       ctx.fillStyle = exitReady ? "#10163A" : "#4D5866";
       ctx.font = "700 11px 'Inter', sans-serif";
-      ctx.fillText(exitReady ? ex.label : "SALIDA BLOQUEADA", ex.x + 4, ex.y + ex.h + 14);
+      ctx.fillText(exitReady ? ex.label : "EXIT LOCKED", ex.x + 4, ex.y + ex.h + 14);
 
       if (editorMode) {
         ctx.save();
@@ -4164,17 +4376,47 @@ function drawInteractable(ctx, obj, accent, done) {
   ctx.restore();
 }
 
-function drawNpc(ctx, npc) {
-  drawPlayer(ctx, npc.x, npc.y, npc.color, npc.id, npc);
+function drawNpc(ctx, npc, image) {
+  if (image?.complete && image.naturalWidth > 0) {
+    const size = 72;
+    const x = npc.x + 20;
+    const y = npc.y + 40 - size / 2;
+    const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight);
+    const width = image.naturalWidth * scale;
+    const height = image.naturalHeight * scale;
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.fillStyle = "rgba(16,22,58,0.18)";
+    ctx.beginPath();
+    ctx.ellipse(x, npc.y + 42, 20, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.drawImage(image, x - width / 2, y - height / 2, width, height);
+    ctx.restore();
+  } else {
+    drawPlayer(ctx, npc.x, npc.y, npc.color, npc.id, npc);
+  }
   ctx.save();
-  ctx.fillStyle = "rgba(16,22,58,0.82)";
   ctx.font = "700 11px 'Inter', sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(npc.name, npc.x + 20, npc.y - 7);
-  if (npc.editorCreated && npc.emoji) {
-    ctx.font = "12px sans-serif";
-    ctx.fillText(npc.emoji, npc.x + 34, npc.y + 25);
-  }
+  const nameY = npc.y - (image?.complete && image.naturalWidth > 0 ? 46 : 23);
+  const nameWidth = ctx.measureText(npc.name).width;
+  const labelX = npc.x + 20;
+  ctx.fillStyle = "rgba(16,22,58,0.82)";
+  ctx.shadowColor = "rgba(0,0,0,0.55)";
+  ctx.shadowBlur = 5;
+  ctx.shadowOffsetY = 2;
+  ctx.beginPath();
+  ctx.roundRect(labelX - nameWidth / 2 - 7, nameY - 12, nameWidth + 14, 18, 6);
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.fillStyle = "#FFFFFF";
+  ctx.strokeStyle = "rgba(16,22,58,0.9)";
+  ctx.lineWidth = 2;
+  ctx.strokeText(npc.name, labelX, nameY);
+  ctx.fillText(npc.name, labelX, nameY);
   ctx.restore();
 }
 
@@ -4219,7 +4461,7 @@ const LEVELS = buildLevels();
 
 export default function JobQuestGame() {
   const [screen, setScreen] = useState("select"); // select | map | game
-  const [language, setLanguage] = useState("es");
+  const language = "en";
   const [character, setCharacter] = useState(null);
   const [currentLevelId, setCurrentLevelId] = useState(null);
   const [lastResult, setLastResult] = useState(null); // {levelId, stars}
@@ -4236,7 +4478,7 @@ export default function JobQuestGame() {
     const np = { ...p, liceo: { ...p.liceo, unlocked: true } };
     np.rumores = { ...np.rumores, unlocked: np.liceo.completed };
     np.centro = { ...np.centro, unlocked: np.rumores.completed };
-    np.mision = { ...np.mision, unlocked: np.liceo.completed && np.rumores.completed && np.centro.completed };
+    np.mision = { ...np.mision, unlocked: np.centro.completed };
     return np;
   }
 
@@ -4276,25 +4518,6 @@ export default function JobQuestGame() {
         * { box-sizing: border-box; }
         body { margin: 0; }
       `}</style>
-
-      <div style={{ position: "fixed", top: 18, right: 18, zIndex: 50 }}>
-        <button
-          type="button"
-          onClick={() => setLanguage((current) => (current === "es" ? "en" : "es"))}
-          style={{
-            borderRadius: 999,
-            border: "2px solid rgba(255,255,255,0.18)",
-            background: "rgba(16,22,58,0.86)",
-            color: "#F5F5F5",
-            padding: "8px 14px",
-            fontWeight: 700,
-            cursor: "pointer",
-            boxShadow: "0 10px 20px rgba(0,0,0,0.22)",
-          }}
-        >
-          {language === "es" ? "ES / EN" : "EN / ES"}
-        </button>
-      </div>
 
       {screen === "select" && <CharacterSelectScreen onSelect={handleSelectCharacter} language={language} />}
 

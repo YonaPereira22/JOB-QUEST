@@ -637,6 +637,24 @@
           "y": 877.6666669845581,
           "w": 22,
           "h": 45.3333740234375
+        },
+        {
+          "x": 368.00001525878906,
+          "y": 315.78728491078624,
+          "w": 46,
+          "h": 20
+        },
+        {
+          "x": 1053.000015258789,
+          "y": 333.1206284166456,
+          "w": 39.33331298828125,
+          "h": 8
+        },
+        {
+          "x": 1048.3333282470703,
+          "y": 321.1206284166456,
+          "w": 38,
+          "h": 12.666656494140625
         }
       ],
       "content": {
@@ -644,14 +662,25 @@
         "objects": [],
         "npcOverrides": {
           "prof_ana": {
-            "name": "Prof. Mateo",
+            "name": "Teacher Mateo",
             "dialogue": [
-              "¡Necesito tu ayuda! En el liceo aparecieron cinco carteles sobre distintas profesiones, pero algunos podrían tener información falsa.",
-              "Recorré las aulas y revisá cada cartel: fijate qué hace cada profesional y dónde trabaja. Si algo no coincide, marcálo como mito.",
-              "También podés conversar con Seño Laura para aprender sobre la docencia. Cuando termines de revisar los carteles, vení a hablar con Cami para resolver la situación y seguir la ruta."
+              "Hi! Welcome to our school!",
+              "Do you know how many different jobs there are in a school?",
+              "Teachers are not the only people who work here!",
+              "Let's find out who works at this school.",
+              "Help me identify the people who work at this school!"
             ],
             "x": 695,
-            "y": 616
+            "y": 616,
+            "id": "prof_ana",
+            "emoji": "👩🏽‍🏫",
+            "color": "#FFD166",
+            "gender": "neutral",
+            "skin": "#F6C9A7",
+            "hair": "#342B35",
+            "hairStyle": "short",
+            "editorCreated": false,
+            "imageUrl": "editor-npcs/prof_ana.png"
           },
           "cami_decision": {
             "id": "cami_decision",
@@ -676,40 +705,53 @@
               "type": "editor",
               "challengeId": "npc:cami_decision",
               "starIndex": 1
-            }
+            },
+            "imageUrl": "editor-npcs/cami_decision.png"
           }
         },
         "objectOverrides": {
           "msg4": {
             "x": 1232,
-            "y": 120
+            "y": 120,
+            "label": "CLASSROOM 1D",
+            "emoji": "📄"
           },
           "msg3": {
             "x": 816,
-            "y": 155.33331298828125
+            "y": 155.33331298828125,
+            "label": "CLASSROOM 1C",
+            "emoji": "📄"
           },
           "msg5": {
             "x": 261.99999999999994,
-            "y": 380.66668701171875
-          },
-          "hidden_book": {
-            "x": 190.6666412353516,
-            "y": 702
+            "y": 380.66668701171875,
+            "label": "CLASSROOM 2D",
+            "emoji": "📄"
           },
           "msg1": {
             "x": 157.33328247070312,
-            "y": 112.66665649414062
+            "y": 112.66665649414062,
+            "label": "CLASSROOM 1A",
+            "emoji": "📄"
+          },
+          "msg2": {
+            "x": 610,
+            "y": 90,
+            "label": "CLASSROOM 1B",
+            "emoji": "📄"
           }
         },
         "removedNpcIds": [
           "teacher_guide"
         ],
-        "removedObjectIds": [],
+        "removedObjectIds": [
+          "hidden_book"
+        ],
         "removedChallengeIds": [],
         "challengeOverrides": {
           "myth:myth2": {
             "id": "myth:myth2",
-            "title": "Cartel del aula 1B",
+            "title": "CLASSROOM 1B",
             "presentation": "multiple",
             "questions": [
               {
@@ -723,7 +765,9 @@
                 "multiSelect": false,
                 "correctIndexes": [
                   1
-                ]
+                ],
+                "correctExplanation": "Doctors care for patients, diagnose problems, and suggest treatment plans.",
+                "retryExplanation": "No es la respuesta correcta. ¡Volvé a intentarlo!"
               }
             ]
           },
@@ -743,7 +787,9 @@
                 "multiSelect": false,
                 "correctIndexes": [
                   1
-                ]
+                ],
+                "correctExplanation": "Excellent! You got it right! You know how to connect professions with their jobs. Keep exploring and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the profession and the information on the sign. Try again!"
               }
             ]
           },
@@ -763,7 +809,9 @@
                 "multiSelect": false,
                 "correctIndexes": [
                   1
-                ]
+                ],
+                "correctExplanation": "Excellent! You got it right! You know how to connect professions with their jobs. Keep exploring and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the profession and the information on the sign. Try again!"
               }
             ]
           },
@@ -783,7 +831,9 @@
                 "multiSelect": false,
                 "correctIndexes": [
                   0
-                ]
+                ],
+                "correctExplanation": "Excellent! You got it right! You know how to connect professions with their jobs. Keep exploring and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the profession and the information on the sign. Try again!"
               }
             ]
           },
@@ -803,7 +853,9 @@
                 "multiSelect": false,
                 "correctIndexes": [
                   1
-                ]
+                ],
+                "correctExplanation": "Excellent! You got it right! You know how to connect professions with their jobs. Keep exploring and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the profession and the information on the sign. Try again!"
               }
             ]
           },
@@ -834,7 +886,9 @@
                   6
                 ],
                 "multiSelect": true,
-                "explanation": "❌ Not quite!\n\nThink about where this person usually works and what their job is.\n\nTry again! 💪"
+                "explanation": "❌ Not quite!\n\nThink about where this person usually works and what their job is.\n\nTry again! 💪",
+                "correctExplanation": "Excellent! This person is part of our school staff. Great job identifying the people who work at our school! Keep going!",
+                "retryExplanation": "Not quite! This person doesn't belong to the school staff in this mission. Think about their job and where they usually work. Try again!"
               }
             ]
           }
@@ -1145,7 +1199,8 @@
               "Today, you will meet different workers and discover their jobs. Each person has different tasks and responsibilities.",
               "Visit the workers, complete their challenges and earn points. Are you ready?"
             ],
-            "editorCreated": true
+            "editorCreated": true,
+            "imageUrl": "editor-npcs/editor-npc-1791592022164.png"
           },
           {
             "id": "editor-npc-1791592125232",
@@ -1167,12 +1222,13 @@
               "type": "editor",
               "challengeId": "npc:editor-npc-1791592125232",
               "starIndex": 1
-            }
+            },
+            "imageUrl": "editor-npcs/editor-npc-1791592125232.webp"
           },
           {
             "id": "editor-npc-1791592363951",
             "x": 542.5350195481791,
-            "y": 251.24371571317994,
+            "y": 269.9104027248987,
             "name": "Chef. Max",
             "emoji": "🧑‍💼",
             "color": "#ffffff",
@@ -1188,12 +1244,13 @@
               "type": "editor",
               "challengeId": "npc:editor-npc-1791592363951",
               "starIndex": 1
-            }
+            },
+            "imageUrl": "editor-npcs/editor-npc-1791592363951.webp"
           },
           {
             "id": "editor-npc-1791592583938",
-            "x": 975.0000305175781,
-            "y": 257.6666450500488,
+            "x": 973.0000305175781,
+            "y": 239.66664505004883,
             "name": "Mechanic. Alex",
             "emoji": "🧑‍💼",
             "color": "#000000",
@@ -1209,7 +1266,8 @@
               "type": "editor",
               "challengeId": "npc:editor-npc-1791592583938",
               "starIndex": 1
-            }
+            },
+            "imageUrl": "editor-npcs/editor-npc-1791592583938.png"
           },
           {
             "id": "editor-npc-1791592755149",
@@ -1230,7 +1288,8 @@
               "type": "editor",
               "challengeId": "npc:editor-npc-1791592755149",
               "starIndex": 1
-            }
+            },
+            "imageUrl": "editor-npcs/editor-npc-1791592755149.png"
           },
           {
             "id": "editor-npc-1791593038413",
@@ -1251,7 +1310,8 @@
               "type": "editor",
               "challengeId": "npc:editor-npc-1791593038413",
               "starIndex": 1
-            }
+            },
+            "imageUrl": "editor-npcs/editor-npc-1791593038413.png"
           }
         ],
         "objects": [],
@@ -1289,7 +1349,9 @@
                   2
                 ],
                 "multiSelect": true,
-                "explanation": "Muy bien."
+                "explanation": "Muy bien.",
+                "correctExplanation": "Excellent! You got it right! You made a responsible decision. Keep going and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the situation and choose the most responsible answer. Try again!"
               }
             ]
           },
@@ -1311,7 +1373,9 @@
                   1
                 ],
                 "multiSelect": true,
-                "explanation": "Muy bien."
+                "explanation": "Muy bien.",
+                "correctExplanation": "Excellent! You got it right! You made a responsible decision. Keep going and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the situation and choose the most responsible answer. Try again!"
               }
             ]
           },
@@ -1334,7 +1398,9 @@
                   3
                 ],
                 "multiSelect": true,
-                "explanation": "Muy bien"
+                "explanation": "Muy bien",
+                "correctExplanation": "Excellent! You got it right! You made a responsible decision. Keep going and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the situation and choose the most responsible answer. Try again!"
               }
             ]
           },
@@ -1356,7 +1422,9 @@
                   1
                 ],
                 "multiSelect": true,
-                "explanation": "Muy bien"
+                "explanation": "Muy bien",
+                "correctExplanation": "Excellent! You got it right! You made a responsible decision. Keep going and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the situation and choose the most responsible answer. Try again!"
               }
             ]
           },
@@ -1378,7 +1446,9 @@
                   2
                 ],
                 "multiSelect": false,
-                "explanation": "Muy bien."
+                "explanation": "Muy bien.",
+                "correctExplanation": "Excellent! You got it right! You made a responsible decision. Keep going and complete your mission!",
+                "retryExplanation": "Not quite! Think carefully about the situation and choose the most responsible answer. Try again!"
               }
             ]
           }
@@ -1812,7 +1882,8 @@
               "Make good decisions, earn points and get ready for your future job.",
               "Good luck!"
             ],
-            "editorCreated": true
+            "editorCreated": true,
+            "imageUrl": "editor-npcs/editor-npc-1791654115307.png"
           }
         ],
         "objects": [

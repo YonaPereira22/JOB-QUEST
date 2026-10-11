@@ -1,14 +1,60 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
 const editorDataPath = fileURLToPath(new URL('./src/editorData.json', import.meta.url))
+const editorNpcImagesPath = fileURLToPath(new URL('./public/editor-npcs/', import.meta.url))
 
 function editorDataPlugin() {
   return {
     name: 'job-quest-project-editor-data',
     configureServer(server) {
+      server.middlewares.use('/__job-quest/npc-image', async (request, response, next) => {
+        if (request.method !== 'POST') {
+          next()
+          return
+        }
+
+        try {
+          let body = ''
+          for await (const chunk of request) {
+            body += chunk
+            if (body.length > 7_000_000) {
+              response.statusCode = 413
+              response.end('La imagen es demasiado grande.')
+              return
+            }
+          }
+
+          const { id, image } = JSON.parse(body)
+          const match = typeof image === 'string' &&
+            /^data:image\/png;base64,([A-Za-z0-9+/]+={0,2})$/.exec(image)
+          if (typeof id !== 'string' || !/^[a-z0-9_-]{1,100}$/i.test(id) || !match) {
+            response.statusCode = 400
+            response.end('Imagen de NPC inválida.')
+            return
+          }
+
+          const imageBuffer = Buffer.from(match[1], 'base64')
+          if (imageBuffer.length > 5_000_000) {
+            response.statusCode = 413
+            response.end('La imagen PNG supera el límite de 5 MB.')
+            return
+          }
+
+          await mkdir(editorNpcImagesPath, { recursive: true })
+          await writeFile(fileURLToPath(new URL(`./public/editor-npcs/${id}.png`, import.meta.url)), imageBuffer)
+          response.statusCode = 200
+          response.setHeader('Content-Type', 'application/json')
+          response.end(JSON.stringify({ imageUrl: `editor-npcs/${id}.png` }))
+        } catch (error) {
+          server.config.logger.error(`Could not save NPC image: ${error.message}`)
+          response.statusCode = 400
+          response.end('No se pudo guardar la imagen del NPC.')
+        }
+      })
+
       server.middlewares.use('/__job-quest/editor-data', async (request, response, next) => {
         if (request.method === 'GET') {
           try {
