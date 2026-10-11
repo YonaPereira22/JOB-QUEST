@@ -2167,7 +2167,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
   const [challengeDraft, setChallengeDraft] = useState(null);
   const toastTimer = useRef(null);
   const initialGuideDialogShown = useRef(false);
-
+  /* Cartel de ediciond muros
   useEffect(() => {
     let cancelled = false;
     async function loadProjectData() {
@@ -2251,7 +2251,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
       objectivesRequired: [...new Set(objectivesRequired)],
     };
   }, [levelConfig, editorContent]);
-
+  /*
   useEffect(() => {
     if (levelConfig.id !== "liceo" || !projectDataReady || initialGuideDialogShown.current) return;
     initialGuideDialogShown.current = true;
