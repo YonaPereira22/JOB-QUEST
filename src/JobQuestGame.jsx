@@ -3166,6 +3166,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         onOpenInventory={() => setInventoryOpen(true)}
         onPause={() => setPaused(true)}
       />
+      {/* Lapiz muros: descomentá este bloque para volver a mostrar el editor.
       <div
         style={{
           position: "absolute",
@@ -3175,7 +3176,6 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           pointerEvents: "auto",
         }}
       >
-        {/* Lapiz muros Wall editor button is intentionally disabled. Remove this JSX comment to re-enable it.
         <BigButton
           onClick={() => {
             if (editorMode) closeEditor("walls");
@@ -3187,7 +3187,6 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         >
           {!projectDataReady ? "Cargando editor..." : editorMode ? "Guardar y cerrar lápiz muros" : "✏ Lápiz muros"}
         </BigButton>
-        */}
         {editorMode && (
           <PixelPanel style={{ marginTop: 8, padding: 10, width: 235, borderColor: "#FFB347", fontSize: 11 }}>
             Drag to draw a wall. Right-click to erase it; use WASD to move around the map without moving the character.
@@ -3204,8 +3203,9 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           </PixelPanel>
         )}
       </div>
+      */}
+      {/* Lapiz NPC: descomentá este bloque para volver a mostrar el editor.
       <div style={{ position: "absolute", top: 48, right: 12, zIndex: 50 }}>
-          {/*Lapiz NPC and clue editor button is intentionally disabled. Remove this JSX comment to re-enable it.
           <BigButton
             onClick={() => {
               if (entityEditorMode) {
@@ -3223,7 +3223,6 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           >
             {!projectDataReady ? "Cargando editor..." : entityEditorMode ? "Guardar y cerrar lápiz NPC" : "✏ Lápiz NPC"}
           </BigButton>
-          */}
           {entityEditorMode && (
             entityEditorMinimized ? (
               <button
@@ -3667,6 +3666,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
             )
           )}
         </div>
+      */}
       {(projectDataError || entityEditorError || projectSaveStatus) && (
         <PixelPanel
           role={projectDataError || entityEditorError ? "alert" : "status"}
@@ -4547,6 +4547,24 @@ export default function JobQuestGame() {
           />
         )
       )}
+      <footer
+        style={{
+          position: "fixed",
+          bottom: 8,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 30,
+          padding: "5px 10px",
+          borderRadius: 8,
+          background: "rgba(16,22,58,0.8)",
+          color: "#C9CFEA",
+          fontSize: 12,
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+        }}
+      >
+        Creador: Yonhatan Pereira
+      </footer>
     </div>
   );
 }
