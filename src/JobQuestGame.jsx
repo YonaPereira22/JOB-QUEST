@@ -3175,6 +3175,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           pointerEvents: "auto",
         }}
       >
+        {/* Lapiz muros Wall editor button is intentionally disabled. Remove this JSX comment to re-enable it.
         <BigButton
           onClick={() => {
             if (editorMode) closeEditor("walls");
@@ -3184,8 +3185,9 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
           style={{ fontSize: 12, padding: "6px 10px" }}
           disabled={!projectDataReady || !!projectDataError || !!projectSaveStatus}
         >
-          {!projectDataReady ? "Loading editor..." : editorMode ? "Save and close walls" : "✏ Edit walls"}
+          {!projectDataReady ? "Cargando editor..." : editorMode ? "Guardar y cerrar lápiz muros" : "✏ Lápiz muros"}
         </BigButton>
+        */}
         {editorMode && (
           <PixelPanel style={{ marginTop: 8, padding: 10, width: 235, borderColor: "#FFB347", fontSize: 11 }}>
             Drag to draw a wall. Right-click to erase it; use WASD to move around the map without moving the character.
@@ -3203,6 +3205,7 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
         )}
       </div>
       <div style={{ position: "absolute", top: 48, right: 12, zIndex: 50 }}>
+          {/*Lapiz NPC and clue editor button is intentionally disabled. Remove this JSX comment to re-enable it.
           <BigButton
             onClick={() => {
               if (entityEditorMode) {
@@ -3218,8 +3221,9 @@ function GameScreen({ levelConfig, character, onExitToMap, onLevelFinished, play
             style={{ fontSize: 12, padding: "6px 10px" }}
             disabled={!projectDataReady || !!projectDataError || !!projectSaveStatus}
           >
-            {!projectDataReady ? "Loading editor..." : entityEditorMode ? "Save and close editor" : "✏ NPCs and clues"}
+            {!projectDataReady ? "Cargando editor..." : entityEditorMode ? "Guardar y cerrar lápiz NPC" : "✏ Lápiz NPC"}
           </BigButton>
+          */}
           {entityEditorMode && (
             entityEditorMinimized ? (
               <button
